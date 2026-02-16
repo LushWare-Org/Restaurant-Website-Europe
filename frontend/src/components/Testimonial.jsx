@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { motion, animate, useMotionValue } from "framer-motion";
+import { Quote } from "lucide-react";
 
 const testimonials = [
   {
@@ -53,7 +54,7 @@ export default function Testimonial() {
   const controlsRef = useRef(null);
 
   useEffect(() => {
-    const controls = animate(x, [0, -2800], {
+    const controls = animate(x, [0, -2000], {
       duration: 80,
       repeat: Infinity,
       ease: "linear",
@@ -74,60 +75,68 @@ export default function Testimonial() {
 
   return (
     <section className="bg-[#fcfaf8] py-32 overflow-hidden relative border-t border-b border-[#eeeae5]  rounded-b-4xl">
-      {/* Decorative center crest background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20rem] font-serif text-[#f2ede8] opacity-20 pointer-events-none select-none">
-        R
-      </div>
 
       <div className="relative z-10 text-center mb-24">
-        <h2 className="text-[#2a2a2a] font-serif text-5xl md:text-6xl font-extralight tracking-tighter italic">
-          What our guests <span className="not-italic text-[#D4AF37]">cherish</span>
+        <h2 className="text-5xl md:text-6xl font-light tracking-[0.05em] uppercase mb-4">
+          What our guests <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700">love</span>
         </h2>
-        <p className="mt-4 text-gray-400 font-sans uppercase tracking-[0.4em] text-[10px] font-bold">
-          The Art of Hospitality
+        <p className="mt-2 text-gray-900 font-serif italic font-semibold  uppercase tracking-[0.2em] text-[18px] ">
+          Thoughts from our happy guests
         </p>
       </div>
 
       <div className="relative">
-        <motion.div className="flex gap-12 px-6" style={{ x }}>
+        <motion.div className="flex gap-16 px-12" style={{ x }}>
           {fullTrack.map((item, index) => (
             <motion.div
               key={index}
-              className="flex-shrink-0 w-[420px] cursor-pointer bg-white p-14 rounded-full border border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.08)] transition-all duration-700 hover:border-[#D4AF37]/30 group"
+              className="flex-shrink-0 w-[450px] relative cursor-pointer bg-white backdrop-blur-sm p-14 border border-stone-100 transition-all duration-1000 hover:bg-white  hover:border-amber-200/50 group"
               onHoverStart={handleHoverStart}
               onHoverEnd={handleHoverEnd}
             >
-              <div className="flex flex-col items-center">
-                <p className="text-[#555] font-serif text-lg italic leading-[1.8] text-center mb-10 whitespace-normal">
+              {/* Floating Quote Icon */}
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-[#FAF9F6] flex items-center justify-center text-amber-600/80 group-hover:text-amber-600/40 transition-colors duration-700">
+                <Quote size={24} strokeWidth={1} />
+              </div>
+
+              <div className="flex flex-col h-full">
+                {/* The Review Text - Increased Leading for Elegance */}
+                <p className="text-stone-500 font-serif text-2xl italic font-semibold leading-relaxed text-left mb-12 relative z-10">
                   "{item.text}"
                 </p>
                 
-                <div className="flex items-center gap-4 text-left">
-                  <img
-                    className="h-16 w-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
-                    src={item.image}
-                    alt={item.name}
-                  />
-                  <div>
-                    <h3 className="text-[#1a1a1a] font-serif text-lg tracking-tight leading-none mb-1">
-                      {item.name}
-                    </h3>
-                    <div className="flex gap-0.5 mb-1">
-                      {[...Array(5)].map((_, i) => <GoldStar key={i} />)}
+                <div className="mt-auto flex items-end justify-between border-t border-stone-300 pt-8">
+                  <div className="flex items-center gap-5">
+                    <div className="relative">
+                      <img
+                        className="h-14 w-14 rounded-full object-cover  border border-stone-200"
+                        src={item.image}
+                        alt={item.name}
+                      />
+                      {/* Premium Accent Ring */}
+                      <div className="absolute -inset-1 border border-amber-500/0 group-hover:border-amber-500/20 rounded-full transition-all duration-700"></div>
                     </div>
-                    <p className="text-[#D4AF37] font-sans text-[9px] tracking-widest uppercase font-bold">
-                      {item.role}
-                    </p>
+                    
+                    <div className="text-left">
+                      <h3 className="text-stone-900 font-serif text-lg font-semibold tracking-wide mb-0.5 uppercase">
+                        {item.name}
+                      </h3>
+                      <p className="text-amber-700/90 font-sans text-[9px] font-bold tracking-[0.3em] uppercase">
+                        {item.role}
+                      </p>
+                    </div>
                   </div>
+
+
                 </div>
               </div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Side Masks for the 'fading in' effect */}
-        <div className="absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-[#fcfaf8] to-transparent pointer-events-none z-20" />
-        <div className="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-[#fcfaf8] to-transparent pointer-events-none z-20" />
+        {/* Side Masks - Softened for Light Mode */}
+        <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-[#FAF9F6] via-[#FAF9F6]/80 to-transparent pointer-events-none z-20" />
+        <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-[#FAF9F6] via-[#FAF9F6]/80 to-transparent pointer-events-none z-20" />
       </div>
     </section>
   );

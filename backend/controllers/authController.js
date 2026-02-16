@@ -8,7 +8,7 @@ const generateToken = (res, payload) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
   });
   return token;
@@ -16,8 +16,8 @@ const generateToken = (res, payload) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { name, email, password, phone, address, city } = req.body;
+    if (!name || !email || !password || !phone || !address || !city) {
       return res.json({
         message: "Please fill all the fields",
         success: false,
@@ -28,7 +28,14 @@ export const registerUser = async (req, res) => {
       return res.json({ message: "User already exists", success: false });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+      city,
+    });
     return res.json({ message: "User registered successfully", success: true });
   } catch (error) {
     console.log(error.message);
@@ -94,7 +101,7 @@ export const adminLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -113,7 +120,11 @@ export const adminLogin = async (req, res) => {
 
 export const logoutUser = async (req, res) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
     return res.json({ message: "User logged out successfully", success: true });
   } catch (error) {
     console.log(error.message);

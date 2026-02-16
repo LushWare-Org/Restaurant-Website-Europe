@@ -61,19 +61,23 @@ const AppContextProvider = ({ children }) => {
 
   const fetchCategories = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.get("/api/category/all");
 
       if (data.success) {
         setCategories(data.categories);
       } else {
-        logconsole.log("Failed to fetch categories");
+        console.log("Failed to fetch categories");
       }
     } catch (error) {
       console.log("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const fetchMenus = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.get("/api/menu/all");
 
       if (data.success) {
@@ -83,6 +87,8 @@ const AppContextProvider = ({ children }) => {
       }
     } catch (error) {
       console.log("Error fetching menus:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,6 +99,7 @@ const AppContextProvider = ({ children }) => {
         setUser(data.user);
       }
     } catch (error) {
+      setUser(null);
       console.log(error);
     }
   };

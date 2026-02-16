@@ -1,20 +1,35 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { Pencil } from "lucide-react";
 
 const Checkout = () => {
-  const { totalPrice, axios, navigate } = useContext(AppContext);
+  const { totalPrice, axios, navigate, user } = useContext(AppContext);
   const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Pay at hotel");
 
+  useEffect(() => {
+    if (user && !address) {
+      const fallbackAddress = [user.address, user.city].filter(Boolean).join(", ");
+      if (fallbackAddress) {
+        setAddress(fallbackAddress);
+      }
+    }
+    if (user && !phone && user.phone) {
+      setPhone(user.phone);
+    }
+  }, [user, address, phone]);
+
   const handleCheckout = async () => {
-    if (!address) {
-      toast.error("Please enter your address");
+    if (!address || !phone) {
+      toast.error("Please enter your address and phone");
       return;
     }
     try {
       const { data } = await axios.post("/api/order/place", {
         address,
+        phone,
         paymentMethod,
       });
       if (data.success) {
@@ -29,73 +44,131 @@ const Checkout = () => {
     }
   };
   return (
-    <div className="max-w-5xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-white shadow-lg rounded-2xl">
-      {/* LEFT SIDE - Address */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-          Delivery Address
-        </h2>
-        <textarea
-          rows={5}
-          value={address}
-          placeholder="enter your full address"
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:outline-none resize-none"
-        ></textarea>
-      </div>
+      <div className="max-w-7xl mx-auto mt-16 mb-24 px-6 lg:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          
+          {/* LEFT SIDE - Guest & Delivery Particulars */}
+          <div className="lg:col-span-7">
+            <header className="mb-10">
+              <h2 className="text-3xl font-serif font-semibold italic text-[#1A1A1A] tracking-tight">
+                Guest Information
+              </h2>
+              <div className="w-16 h-[2px] bg-[#A68966] mt-4"></div>
+            </header>
 
-      {/* RIGHT SIDE - Order Summary */}
-      <div className="flex flex-col justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-            Order Summary
-          </h2>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <p className="flex justify-between text-lg font-medium text-gray-700">
-              <span>Total Amount:</span>
-              <span className="text-green-600 font-semibold">
-                $. {totalPrice}
-              </span>
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div className="border-l border-[#a18664] pl-4">
+                <label className="block text-[12px] uppercase tracking-[0.15em] text-[#A68966] font-bold mb-1">
+                  Full Name
+                </label>
+                <p className="text-lg font-semibold font-serif text-[#1A1A1A]">{user?.name || "Valued Guest"}</p>
+              </div>
+              <div className="border-l border-[#a18664] pl-4">
+                <label className="block text-[12px] uppercase tracking-[0.15em] text-[#A68966] font-bold mb-1">
+                  Email Address
+                </label>
+                <p className="text-base font-medium text-[#1A1A1A]">{user?.email}</p>
+              </div>
+            </div>
+
+            <div className="space-y-10">
+              <div className="group">
+                <label className="flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-[#A68966] font-bold mb-2">
+                  <Pencil size={14} />
+                  Contact Number
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  placeholder="e.g. +44 20 7946 0000"
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-transparent border-b border-[#7d6b56] py-3 focus:border-[#1A1A1A] focus:outline-none transition-colors text-lg font-medium"
+                />
+              </div>
+
+              <div className="group">
+                <label className="flex items-center gap-2 text-[12px] uppercase tracking-[0.15em] text-[#A68966] font-bold mb-2">
+                  <Pencil size={14} />
+                  Delivery Address
+                </label>
+                <textarea
+                  rows={2}
+                  value={address}
+                  placeholder="Enter the full street address for our concierge..."
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-transparent border-b border-[#7d6b56] py-3 focus:border-[#1A1A1A] focus:outline-none transition-colors text-lg font-medium resize-none"
+                ></textarea>
+              </div>
+            </div>
           </div>
 
-          <h3 className="text-lg font-medium mb-2 text-gray-800">
-            Payment Method
-          </h3>
-          <div className="space-y-3">
-            <label htmlFor="" className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="payment"
-                value="Pay at hotel"
-                checked={paymentMethod === "Pay at hotel"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              <span>Pay at hotel</span>
-            </label>
+          {/* RIGHT SIDE - Order Statement */}
+          <div className="lg:col-span-5">
+            <div className="bg-[#FBF9F6] border border-[#E8E1D9] p-8 lg:p-12 sticky top-10">
+              <h2 className="text-sm uppercase tracking-[0.3em] text-[#1A1A1A] font-bold mb-10 text-center border-b border-[#bfab94] pb-6">
+                Order Summary
+              </h2>
 
-            <label className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="payment"
-                value="Online Payment"
-                checked={paymentMethod === "Online Payment"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="text-green-600 focus:ring-green-500"
-              />
-              <span>Online Payment</span>
-            </label>
+              <div className="space-y-6 mb-12">
+                <div className="flex justify-between items-center text-[#8C7E6A]">
+                  <span className="text-[13px] font-semibold uppercase tracking-widest">Subtotal</span>
+                  <span className="font-semibold">£{totalPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center text-[#8C7E6A]">
+                  <span className="text-[13px] font-semibold uppercase tracking-widest">Gratuity</span>
+                  <span className="italic font-semibold text-xs">Included</span>
+                </div>
+                <div className="pt-6 border-t border-[#a58d70] flex justify-between items-baseline">
+                  <span className="text-sm uppercase tracking-[0.3em] font-bold text-[#1A1A1A]">Total</span>
+                  <span className="text-4xl font-medium font-serif italic text-[#1A1A1A]">
+                    £{totalPrice.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mb-10">
+                <h3 className="text-[12px] uppercase tracking-[0.2em] text-[#A68966] font-bold mb-6 text-center">
+                  Payment Method
+                </h3>
+                <div className="space-y-3">
+                  {[
+                    { id: "Pay at hotel", label: "Pay at Resturant" },
+                    { id: "Online Payment", label: "Online Payment" }
+                  ].map((method) => (
+                    <label 
+                      key={method.id}
+                      className={`flex items-center justify-between p-4 border cursor-pointer transition-all duration-300 ${
+                        paymentMethod === method.id 
+                        ? "border-[#1A1A1A] bg-white shadow-sm" 
+                        : "border-transparent opacity-50 hover:opacity-100"
+                      }`}
+                    >
+                      <span className="text-lg font-semibold font-serif italic text-[#1A1A1A]">{method.label}</span>
+                      <input
+                        type="radio"
+                        name="payment"
+                        value={method.id}
+                        checked={paymentMethod === method.id}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="accent-[#1A1A1A] h-4 w-4"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                className="w-full cursor-pointer bg-[#1A1A1A] text-[#F5F5F5] py-5 uppercase tracking-[0.4em] text-[12px] font-bold hover:bg-[#A68966] transition-all duration-700 hover:scale-105 shadow-xl"
+              >
+                Confirm Order
+              </button>
+              
+              
+            </div>
           </div>
         </div>
-
-        <button
-          onClick={handleCheckout}
-          className="mt-6 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-medium cursor-pointer"
-        >
-          Confirm Order
-        </button>
       </div>
-    </div>
   );
 };
 export default Checkout;

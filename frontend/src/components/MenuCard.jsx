@@ -56,7 +56,7 @@ const MenuCard = ({ menu }) => {
             <button
               onClick={() => addToCart(menu._id)}
               disabled={!menu.isAvailable}
-              className="group/btn relative flex-1 flex items-center justify-center gap-2 py-4 bg-stone-900 text-white text-[11px] tracking-[0.15em] uppercase transition-all duration-500 hover:bg-[#C5A059] hover:text-stone-800 disabled:bg-stone-200"
+              className="group/btn cursor-pointer relative flex-1 flex items-center justify-center gap-2 py-4 bg-stone-900 text-white text-[11px] tracking-[0.15em] uppercase transition-all duration-500 hover:bg-[#C5A059] hover:text-stone-800 disabled:bg-stone-200"
             >
               <span className="font-bold">{menu.isAvailable ? "Add to Order" : "Reserved"}</span>
               <svg 

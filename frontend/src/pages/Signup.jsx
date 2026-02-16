@@ -70,8 +70,10 @@ const Auth = () => {
             transition={{ duration: 1.4, ease: [0.85, 0, 0.15, 1] }}
             className="flex w-[200%] h-full flex-shrink-0"
         >
+
             {/* SECTION I: LOGIN */}
             <div className="w-1/2 h-full flex flex-col md:flex-row items-center px-12 md:px-24">
+
                 <div className="w-full md:w-1/2 md:pr-20 space-y-10">
                     <div className="space-y-4">
 
@@ -123,6 +125,7 @@ const Auth = () => {
 
             {/* SECTION II: REGISTER */}
             <div className="w-1/2 h-full flex flex-col md:flex-row items-center px-12 md:px-24 ">
+
                 <div className="w-full md:w-1/2 md:pr-20 space-y-10">
                     <div className="space-y-4">
 

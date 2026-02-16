@@ -1,9 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-
 @config "../tailwind.config.js";
 @import "tailwindcss";
 * {
-  font-family: "Roboto", sans-serif;
+  font-family: "Montserrat", sans-serif;
+}
+
+.font-serif {
+  font-family: "Cormorant Garamond", serif;
+}
+
+.font-sans {
+  font-family: "Montserrat", sans-serif;
 }
 
 :root {
@@ -38,4 +44,20 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #c79a2f;
+}
+
+@keyframes subtle-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-subtle-zoom {
+  animation: subtle-zoom 20s infinite ease-in-out;
 }

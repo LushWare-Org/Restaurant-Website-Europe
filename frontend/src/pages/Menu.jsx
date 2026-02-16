@@ -108,9 +108,9 @@ const Menu = () => {
               <div className="hidden md:block h-24 w-[1px] bg-stone-100"></div>
 
               {/* The Heritage Statement (Right) */}
-              <div className="w-full md:w-1/3">
+              <div className="w-full   md:w-1/3">
                 <div className="border-l-2 border-[#B38728]/40 pl-6 py-2">
-                  <p className="text-stone-800 font-serif  text-xl leading-relaxed">
+                  <p className="text-stone-600 font-semibold tracking-wide font-serif italic text-2xl leading-relaxed">
                     "A refined collection of signature dishes, where every plate tells a story of heritage and season."
                   </p>
                   <span className="block mt-4 text-[12px] uppercase tracking-[0.3em] text-stone-700">

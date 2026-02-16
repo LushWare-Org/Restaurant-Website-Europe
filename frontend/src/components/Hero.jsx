@@ -1,5 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import { Play, Pause, Volume2, VolumeX, ChevronDown } from "lucide-react";
 
 const Hero = () => {
   const { navigate } = useContext(AppContext);
@@ -20,67 +21,93 @@ const Hero = () => {
     videoRef.current.muted = !videoRef.current.muted;
     setIsMuted(!isMuted);
   };
+
   return (
-    <section
-      className="sticky top-16 md:top-20 left-0 z-10 min-h-[calc(100dvh-4rem)] md:min-h-[calc(100dvh-5rem)] flex items-center justify-center overflow-hidden"
-
-    >
-        {/* Background Video */}
-  <video
-    className="absolute inset-0 w-full h-full object-cover"
-    src="/video.mp4"
-    autoPlay
-    loop
-    muted
-    playsInline
-  />
-
-
-      {/* Content */}
-      <div className="relative z-10 text-center text-white px-6">
-        <span className="block text-sm uppercase tracking-[0.4em] mb-4 text-amber-400 font-medium">
-          Est. 2026 • London
-        </span>
-
-        <h1 className="text-5xl md:text-8xl font-serif italic mb-6 tracking-tight">
-          The <span className="text-amber-200">Grand</span> Pavilion
-        </h1>
-        
-        <p className="text-lg md:text-2xl font-light mb-12 max-w-3xl mx-auto italic leading-relaxed font-serif opacity-90">
-          An exquisite journey through culinary excellence, served with the timeless elegance of British tradition.
-        </p>
-
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-8">
-          <button
-            onClick={() => navigate("/menu")}
-            className="group relative cursor-pointer px-10 py-4 overflow-hidden border border-amber-500 bg-amber-600/10 transition-all duration-500 hover:bg-amber-500"
-          >
-            <span className="relative z-10 text-sm uppercase tracking-[0.2em] font-semibold group-hover:text-black transition-colors duration-500">
-              Explore Our Menus
-            </span>
-          </button>
-
-          <button
-            onClick={() => navigate("/book-table")}
-            className="cursor-pointer group flex items-center gap-3 text-sm uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:text-amber-400"
-          >
-            <span className="border-b border-white group-hover:border-amber-400 py-1">
-              Reserve a Table
-            </span>
-            <svg 
-              className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
-        </div>
+    <section className="    sticky  top-22 left-0 min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0F0F0F]">
+      
+      {/* 1. Cinematic Foundation */}
+      <div className="absolute inset-0 z-0">
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover scale-105 animate-subtle-zoom"
+          src="/video.mp4"
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+        />
+        {/* Deep Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60"></div>
+        <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"></div>
+      {/* 2. The Royal Frame (Borders) */}
+      <div className="absolute inset-6 border border-white/15 pointer-events-none z-20 md:inset-8"></div>
+
+      {/* 3. Main Content Section */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6">
+        
+        {/* Minimalist Descriptor */}
+        <span className="mb-6 font-sans text-[10px] tracking-[0.6em] text-amber-200/80 uppercase">
+          Established 2026 • Mayfair
+        </span>
+
+        {/* Hero Title with Layered Serif */}
+        <div className="relative group">
+          <h2 className="absolute -top-12 left-1/2 -translate-x-1/2 text-white/8 text-8xl md:text-[15rem] font-serif italic select-none whitespace-nowrap transition-transform duration-1000 group-hover:scale-110">
+            Heritage
+          </h2>
+          
+          <h1 className="relative text-5xl md:text-9xl font-serif font-light text-white tracking-[0.2em] uppercase leading-tight">
+            Black<span className="text-amber-400 font-serif font-light  ">pepper</span>
+          </h1>
+        </div>
+
+        {/* Decorative Divider */}
+        <div className="mt-8 flex items-center gap-4">
+          <div className="h-[1px] w-12 bg-white/40"></div>
+          <div className="w-2 h-2 rotate-45 border border-amber-400/80"></div>
+          <div className="h-[1px] w-12 bg-white/40"></div>
+        </div>
+
+        {/* Narrative & Call to Action */}
+        <p className="mt-8 max-w-lg text-stone-200/80 font-serif italic text-lg md:text-xl leading-relaxed">
+          "A symphony of rare spices and local craft, served in the heart of London."
+        </p>
+
+        <button 
+          onClick={() => navigate('/menu')}
+          className="mt-12 group border cursor-pointer border-white/80 relative px-16 py-4 bg-transparent overflow-hidden"
+        >
+          <span className="relative z-10 text-white font-sans text-[11px] tracking-[0.5em] uppercase">
+            View the Collection
+          </span>
+        </button>
+      </div>
+
+      {/* 4. Functional Accents (Higher Placement) */}
+      <div className="absolute bottom-32 right-10 md:right-16 z-30 flex flex-col gap-4 items-center">
+
+        
+        <button onClick={togglePlay} className="text-white/80 border cursor-pointer border-white/50 rounded-full p-2 hover:text-amber-400 transition-colors">
+          {isPlaying ? <Pause size={20} strokeWidth={1} /> : <Play size={20} strokeWidth={1} />}
+        </button>
+        
+        <button onClick={toggleMute} className="text-white/80 border cursor-pointer border-white/50 rounded-full p-2 hover:text-amber-400 transition-colors">
+          {isMuted ? <VolumeX size={20} strokeWidth={1} /> : <Volume2 size={20} strokeWidth={1} />}
+        </button>
+      </div>
+
+      {/* 5. Scroll Indicator */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center animate-bounce opacity-50">
+        <ChevronDown size={20} className="text-white" strokeWidth={1} />
+      </div>
+
+      {/* 6. Textures */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] z-20"></div>
+
     </section>
   );
 };
+
 export default Hero;

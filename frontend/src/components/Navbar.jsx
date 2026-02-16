@@ -60,7 +60,7 @@ const Navbar = () => {
       className={`sticky top-0 z-[100] transition-colors duration-500 ${
         isScrolled
           ? "bg-[#FCFBFA] border-b border-[#E5E0D8]"
-          : " "
+          : "bg-black border-b border-transparent"
       }`}
       
     >
@@ -78,14 +78,14 @@ const Navbar = () => {
         ></div>
       )}
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex items-center justify-between h-16 md:h-20">
           
-          {/* Left - Text Logo */}
+          {/* Left - Text Logo 
           <div className="flex items-center">
             <Link to="/" className="group flex flex-col items-start leading-none transition-all duration-500 hover:opacity-80">
               <div className="flex items-baseline gap-1">
-                {/* "BLACK" in deep charcoal, "PEPPER" in Gold */}
+                {/* "BLACK" in deep charcoal, "PEPPER" in Gold 
                 <span
                   className={`text-2xl md:text-3xl font-black tracking-tighter uppercase transition-colors duration-300 ${
                     isScrolled ? "text-[#1A1A1A]" : "text-[#F5F2EC]"
@@ -105,16 +105,16 @@ const Navbar = () => {
 
             </Link>
           </div>
-
+          */}
           {/* Center - Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
+          <div className="hidden md:flex items-center space-x-14">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`transition-all duration-300 font-sans text-xs tracking-[0.2em] uppercase font-bold ${
+                className={`transition-all duration-300 font-serif italic  text-md tracking-[0.2em] uppercase font-extrabold ${
                   isScrolled
-                    ? "text-[#4A4A4A] hover:text-[#C5A059]"
+                    ? "text-[#1f1e1e] hover:text-[#C5A059]"
                     : "text-[#EDEDED] hover:text-[#C5A059]"
                 }`}
               >
@@ -129,7 +129,7 @@ const Navbar = () => {
             {/* Cart Icon */}
             <button
               onClick={() => navigate("/cart")}
-              className={`relative p-2 transition-colors group ${
+              className={`relative cursor-pointer p-2 transition-colors group ${
                 isScrolled
                   ? "text-[#4A4A4A] hover:text-[#C5A059]"
                   : "text-[#EDEDED] hover:text-[#C5A059]"
@@ -160,7 +160,7 @@ const Navbar = () => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-0 w-56 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.08)] py-3 border border-[#E5E0D8] animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="px-4 py-2 border-b border-gray-50 mb-2">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Account</p>
+                        <p className="text-[12px] uppercase tracking-widest text-gray-400 font-bold">Account</p>
                         <p className="text-sm font-serif text-[#1A1A1A] truncate">{user.name}</p>
                       </div>
                       <Link
@@ -192,10 +192,10 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => navigate("/auth")}
-                  className={`text-white text-[10px] tracking-[0.2em] uppercase px-7 py-3 transition-all duration-500 font-bold shadow-lg shadow-black/5 ${
+                  className={`text-white cursor-pointer text-[12px] tracking-[0.2em] uppercase px-7 py-3 transition-all duration-500 font-serif italic font-semibold shadow-lg shadow-black/5 ${
                     isScrolled
                       ? "bg-[#1A1A1A] hover:bg-[#C5A059]"
-                      : "bg-[#C5A059] hover:bg-[#1A1A1A]"
+                      : "bg-transparent border border-white/90 hover:bg-[#1A1A1A]"
                   }`}
                 >
                   Join Us
@@ -222,7 +222,7 @@ const Navbar = () => {
                   key={link.name}
                   to={link.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-[#4A4A4A] text-sm tracking-widest uppercase font-bold hover:text-[#C5A059]"
+                  className="text-[#4A4A4A] text-sm tracking-widest uppercase font-serif italic font-semibold hover:text-[#C5A059]"
                 >
                   {link.name}
                 </Link>
@@ -230,14 +230,14 @@ const Navbar = () => {
               <div className="h-[1px] bg-[#E5E0D8] w-full my-2" />
               {user ? (
                 <>
-                  <Link to="/my-bookings" className="text-sm tracking-widest uppercase text-gray-500" onClick={() => setIsMenuOpen(false)}>My Bookings</Link>
-                  <Link to="/my-orders" className="text-sm tracking-widest uppercase text-gray-500" onClick={() => setIsMenuOpen(false)}>My Orders</Link>
-                  <button onClick={logout} className="text-sm tracking-widest uppercase text-red-500 font-bold text-left">Logout</button>
+                  <Link to="/my-bookings" className="text-sm tracking-widest uppercase text-gray-500 font-serif italic font-semibold" onClick={() => setIsMenuOpen(false)}>My Bookings</Link>
+                  <Link to="/my-orders" className="text-sm tracking-widest uppercase text-gray-500 font-serif italic font-semibold" onClick={() => setIsMenuOpen(false)}>My Orders</Link>
+                  <button onClick={logout} className="text-sm tracking-widest uppercase text-red-500 font-serif italic font-semibold text-left">Logout</button>
                 </>
               ) : (
                 <button
                   onClick={() => navigate("/auth")}
-                  className="bg-[#C5A059] text-white text-xs tracking-widest uppercase py-4 font-bold"
+                  className="bg-[#C5A059] text-white text-xs tracking-widest uppercase py-4 font-serif italic font-semibold"
                 >
                   Login / Register
                 </button>

@@ -13,8 +13,9 @@ import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import AdminLayout from "./pages/admin/AdminLayout";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "./context/AppContext";
+import Loading from "./components/Loading";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AddCategory from "./pages/admin/AddCategory";
 import AddMenu from "./pages/admin/AddMenu";
@@ -24,12 +25,27 @@ import Orders from "./pages/admin/Orders";
 import Bookings from "./pages/admin/Bookings";
 import Dashboard from "./pages/admin/Dashboard";
 const App = () => {
-  const adminPath = useLocation().pathname.includes("admin");
-  const { admin } = useContext(AppContext);
+  const location = useLocation();
+  const adminPath = location.pathname.includes("admin");
+  const isAuthPath = ['/auth', '/login', '/signup'].includes(location.pathname);
+  const { admin, loading: adminLoading } = useContext(AppContext); // rename context loading
+  const [isPageLoading, setIsPageLoading] = useState(true); // local page loading
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <div>
       <Toaster />
-      {!adminPath && <Navbar />}
+      {(isPageLoading || adminLoading) && <Loading />}
+      {!adminPath && !isAuthPath && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
@@ -67,7 +83,7 @@ const App = () => {
           />
         </Route>
       </Routes>
-      {!adminPath && <Footer />}
+      {!adminPath && !isAuthPath && <Footer />}
     </div>
   );
 };

@@ -4,11 +4,11 @@ import Cart from "../models/cartModel.js";
 export const placeOrder = async (req, res) => {
   try {
     const { id } = req.user;
-    const { address, paymentMethod } = req.body;
-    if (!address)
+    const { address, paymentMethod, phone } = req.body;
+    if (!address || !phone)
       return res
         .status(400)
-        .json({ message: "Delivery address is required", success: false });
+        .json({ message: "Delivery address and phone are required", success: false });
 
     const cart = await Cart.findOne({ user: id }).populate("items.menuItem");
 
@@ -28,6 +28,7 @@ export const placeOrder = async (req, res) => {
       })),
       totalAmount,
       address,
+      phone,
       paymentMethod,
     });
 

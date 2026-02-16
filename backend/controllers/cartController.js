@@ -55,10 +55,50 @@ export const removeFromCart = async (req, res) => {
     const cart = await Cart.findOne({ user: id });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
     cart.items = cart.items.filter(
-      (item) => item.menuItem._id.toString() !== menuId
+      (item) => item.menuItem.toString() !== menuId
     );
     await cart.save();
     res.status(200).json({ message: "Item removed from cart", success: true });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: "Internal server error", success: false });
+  }
+};
+
+export const updateCartQuantity = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { menuId } = req.params;
+    const { quantity } = req.body;
+
+    const parsedQuantity = Number(quantity);
+    if (!Number.isFinite(parsedQuantity)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid quantity", success: false });
+    }
+
+    const cart = await Cart.findOne({ user: id });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+    const itemIndex = cart.items.findIndex(
+      (item) => item.menuItem.toString() === menuId
+    );
+
+    if (itemIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "Item not found in cart", success: false });
+    }
+
+    if (parsedQuantity <= 0) {
+      cart.items.splice(itemIndex, 1);
+    } else {
+      cart.items[itemIndex].quantity = parsedQuantity;
+    }
+
+    await cart.save();
+    res.status(200).json({ message: "Cart updated", success: true, cart });
   } catch (error) {
     console.log(error);
     return res.json({ message: "Internal server error", success: false });

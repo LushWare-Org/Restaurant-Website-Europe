@@ -4,8 +4,8 @@ import { useLocation } from 'react-router-dom';
 export default function Footer() {
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const footerClassName = `relative z-0 w-full min-h-[700px] bg-[#020202] text-white overflow-hidden flex flex-col font-serif ${
-    isHome ? 'sticky bottom-0 h-screen' : 'h-auto'
+  const footerClassName = `relative z-0 w-full max-h-[92vh] bg-[#020202] text-white overflow-hidden flex flex-col font-serif ${
+    isHome ? 'sticky bottom-0 h-screen' : 'h-screen'
   }`;
   return (
     <footer className={footerClassName}>
@@ -14,7 +14,7 @@ export default function Footer() {
       <div className="absolute inset-0 flex">
         <div className="w-full lg:w-1/2 h-full bg-[#020202] z-10" />
         <div 
-          className="absolute lg:relative w-full lg:w-1/2 h-full z-0 opacity-50 lg:opacity-60 grayscale-[0.5] contrast-125"
+          className="absolute lg:relative w-full lg:w-1/2 h-full z-0 opacity-50 lg:opacity-60 grayscale-[0.5] contrast-110"
           style={{
             backgroundImage: "url('/footer.jpg')",
             backgroundSize: 'cover',
@@ -24,7 +24,7 @@ export default function Footer() {
       </div>
 
       {/* OVERLAY: Gold Light Leak */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#020202] via-[#020202]/80 to-transparent lg:to-black/20" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#020202] via-[#020202]/80 to-transparent lg:to-black/30" />
 
       <div className="relative z-20 flex-grow flex flex-col justify-between p-8 md:p-16 lg:p-24">
         
@@ -44,7 +44,7 @@ export default function Footer() {
               <span className="text-[#f5dbab] text-[10px] md:text-xs font-bold tracking-[1em] uppercase mb-4 opacity-60 ml-1 hidden md:block">
                 Haute Cuisine Européenne
               </span>
-              <h2 className="text-6xl md:text-[8vw] xl:text-[7vw] tracking-tighter text-white uppercase leading-[0.75] font-light">
+              <h2 className="text-6xl md:text-[7vw] xl:text-[6vw] tracking-tighter text-white uppercase leading-[0.75] font-light">
                 Black <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-amber-400 to-amber-800 italic ml-8 md:ml-20 lg:ml-28 block">
                   Pepper
@@ -54,7 +54,7 @@ export default function Footer() {
           </div>
 
           <div className="text-right hidden md:block">
-            <div className="flex gap-2 justify-end mb-4">
+            <div className="flex gap-2 justify-end mt-12 mb-4">
               {[1, 2, 3,4,5].map((star) => (
                 <svg key={star} className="w-5 h-5 text-[#c5a059]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z" />
@@ -66,7 +66,7 @@ export default function Footer() {
         </div>
 
         {/* MIDDLE: THE SERVICE ATELIER */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 mt-8  border-t border-white/5 pt-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16   border-t border-white/5 pt-12">
           
           <div className="space-y-6">
             <h4 className="text-[#c5a059] text-xs tracking-[0.4em] uppercase font-bold">The Atelier</h4>
@@ -146,7 +146,7 @@ export default function Footer() {
         </div>
 
         {/* BOTTOM: THE STATUS BAR */}
-        <div className="mt-auto pt-12  flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/5">
+        <div className="mt-auto pt-8  flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/50">
           <div className="flex items-center gap-12 text-gray-200 grayscale  hover:opacity-100 transition-all duration-700">
              {/* Royal Partnership Names (Substitute for actual logos) */}
              <span className="text-[11px] tracking-[0.3em] uppercase">Vogue Gastronomy</span>

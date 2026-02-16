@@ -32,16 +32,15 @@ const Menus = () => {
             <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#C5A059]"></div>
           </div>
 
-          <h2 className="text-6xl md:text-8xl font-serif text-stone-900 mb-8 tracking-tighter">
-            Our <span className="italic font-light text-stone-400">Culinary</span> <span className="text-[#C5A059]">Legacy</span>
+          <h2 className="text-5xl md:text-7xl font-light tracking-[0.05em] uppercase mb-6">
+            Food You’ll  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700">Love</span>
           </h2>
           
-          <div className="max-w-2xl mx-auto relative">
+          <div className="max-w-4xl mx-auto relative">
             {/* Quote marks for a literary feel */}
             <span className="absolute -top-4 -left-8 text-6xl text-stone-100 font-serif">“</span>
-            <p className="text-stone-500 font-serif italic text-xl leading-relaxed">
-              A grand tour of twelve curated chapters, showcasing the finest 
-              seasonal harvests from across the United Kingdom.
+            <p className="text-stone-500 font-semibold font-serif italic text-2xl leading-relaxed">
+              A menu of fresh, seasonal dishes made with quality ingredients from across the United Kingdom.
             </p>
             <span className="absolute -bottom-8 -right-8 text-6xl text-stone-100 font-serif">”</span>
           </div>

@@ -1,118 +1,247 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { Diamond } from "lucide-react";
+
 const BookTable = () => {
   const { axios, navigate } = useContext(AppContext);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
+  // State for the "Shopping Cart" of seats
+  const [selectedSeats, setSelectedSeats] = useState([]); // Array of strings like ["A0", "B5"]
+  const [activeTable, setActiveTable] = useState("A"); // Which table is currently being viewed
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    numberOfPeople: "",
-    date: "",
-    time: "",
-    note: "",
+    name: "", email: "", phone: "", date: "", time: "", note: "",
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const tableIDs = ["A", "B", "C", "D", "E", "F"];
+
+  const toggleSeat = (tableId, seatIndex) => {
+    const seatId = `${tableId}${seatIndex}`;
+    if (selectedSeats.includes(seatId)) {
+      setSelectedSeats(selectedSeats.filter(s => s !== seatId));
+    } else {
+      setSelectedSeats([...selectedSeats, seatId]);
+    }
+  };
+
+  const removeSeat = (id) => {
+    setSelectedSeats(selectedSeats.filter(s => s !== id));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (selectedSeats.length === 0) return toast.error("Please select at least one seat.");
+    
     try {
-      const { data } = await axios.post("/api/booking/create", formData);
+      const payload = { ...formData, reservedSeats: selectedSeats };
+      const { data } = await axios.post("/api/booking/create", payload);
       if (data.success) {
-        toast.success(data.message);
+        toast.success("Your royal table is ready.");
         navigate("/my-bookings");
-      } else {
-        toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong!");
+      toast.error("An error occurred during booking.");
     }
   };
+
   return (
-    <div className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6">
-      <h2 className="text-2xl font-semibold text-center mb-6">Book a Table</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="You Name"
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Your Email"
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Phone Number"
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-          <input
-            type="number"
-            name="numberOfPeople"
-            value={formData.numberOfPeople}
-            onChange={handleChange}
-            placeholder="Number of Guests"
-            min="1"
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-          <input
-            type="time"
-            name="time"
-            value={formData.time}
-            onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none"
-            required
-          />
-        </div>
-        <textarea
-          name="note"
-          value={formData.note}
-          onChange={handleChange}
-          placeholder="Special Requests (optional)"
-          rows="3"
-          className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-green-500 focus:outline-none resize-none"
-        ></textarea>
-
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-medium"
+    <div className="min-h-screen bg-[#FFFFFF] text-[#1a1a1a]">
+      {/* --- PREMIUM HERO SECTION --- */}
+        <div
+          className="relative h-[70vh] bg-cover bg-fixed bg-center flex items-center justify-center overflow-hidden"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1643066873594-4df339b2e232?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          }}
         >
-          Confirm Booking
-        </button>
-      </form>
+          <div className="absolute inset-0 bg-[#0a0a0a]/40 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent  to-[#ffffff]"></div>
+          
+          <div className="relative text-center z-10 px-4">
+            <span className="text-[#ffffff] uppercase tracking-[0.4em] text-xs mb-4 block font-medium animate-fade-in">
+              Reserve Your Experience • Fine Dining
+            </span>
+            <h1 className="text-5xl md:text-8xl font-serif italic tracking-tight text-white mb-8">
+              The <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500"  >Gourmet</span> Table
+            </h1>
+
+
+          </div>
+        </div>
+        {/* --- OVERLAPPING IMAGE SECTION --- */}
+        <div className="relative max-w-6xl mx-auto px-6 -mt-32 z-10">
+          <div className="bg-white  rounded-sm ">
+              <img 
+                src="/tablesview.png" 
+                alt="System Architecture Layout" 
+                className="w-full h-full object-contain "
+              />
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-4 gap-12">
+          
+          {/* 2. TABLE & SEAT SELECTION SECTION */}
+          <div className="lg:col-span-3">
+            <h2 className="text-md uppercase font-medium tracking-widest text-gray-800 mb-8 border-b pb-4">01. Select Your Seats</h2>
+            
+            {/* Table Selector Tabs */}
+            <div className="flex space-x-4 mb-10 overflow-x-auto pb-2">
+              {tableIDs.map((id) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTable(id)}
+                  className={`px-8 py-4 rounded-sm transition-all border font-serif text-xl
+                    ${activeTable === id 
+                      ? "bg-[#1a1a1a] text-[#f2d696] border-[#1a1a1a] scale-105 shadow-lg" 
+                      : "bg-white text-gray-600 border-gray-100 hover:border-[#bc9437]"}`}
+                >
+                  Table {id}
+                </button>
+              ))}
+            </div>
+
+            {/* Seat Grid for Active Table */}
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-6 max-w-3xl mx-auto p-8 bg-[#FDFDFD] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 rounded-xl">
+              {[...Array(9)].map((_, i) => {
+                const seatId = `${activeTable}${i}`;
+                const isSelected = selectedSeats.includes(seatId);
+                
+                return (
+                  <button
+                    key={seatId}
+                    onClick={() => toggleSeat(activeTable, i)}
+                    className={`relative group h-28 flex flex-col items-center justify-center transition-all duration-500 rounded-sm border
+                      ${isSelected 
+                        ? "bg-[#121212] border-[#c4a661] shadow-2xl scale-105 z-10" // The Dark Mode Flip
+                        : "bg-white border-gray-300 hover:border-[#c4a661]/40 hover:shadow-md"}`}
+                  >
+                    {/* Subtle Tracking label */}
+                    <span className={`text-[12px] uppercase tracking-[0.25em] mb-2 font-medium transition-colors duration-300
+                      ${isSelected ? 'text-[#c4a661]' : 'text-gray-700'}`}>
+                      Seat
+                    </span>
+
+                    {/* The Number */}
+                    <span className={`text-4xl font-serif italic transition-colors duration-300
+                      ${isSelected ? 'text-white' : 'text-[#222]'}`}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+
+                    {/* Luxury Selection Indicator */}
+                    {isSelected && (
+                      <>
+                        {/* Top gold accent line */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[#c4a661]" />
+                        {/* Floating checkmark */}
+                        <div className="absolute -top-2 -right-2 bg-[#c4a661] text-[#121212] rounded-full w-6 h-6 text-[10px] flex items-center justify-center font-bold shadow-lg border border-[#121212]">
+                          ✓
+                        </div>
+                      </>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. BOOKING SUMMARY & CTA */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-10 bg-white border border-gray-500 p-8 ">
+              <h2 className="text- text-gray-800 font-medium uppercase tracking-widest mb-6">Reservation Summary</h2>
+              
+              <div className="space-y-3 mb-8 min-h-[100px]">
+                {selectedSeats.length === 0 ? (
+                  <p className="text-gray-400 italic text-sm">No seats selected yet...</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedSeats.map(seat => (
+                      <span key={seat} className="bg-gray-100 text-[#1a1a1a] px-3 py-1 text-xs font-bold rounded-full flex items-center">
+                        {seat} 
+                        <button onClick={() => removeSeat(seat)} className="ml-2 text-gray-400 hover:text-red-500">×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-6">
+                <div className="flex justify-between mb-6">
+                  <span className="text-gray-800 font-medium text-sm">Total Seats:</span>
+                  <span className="font-bold">{selectedSeats.length}</span>
+                </div>
+                <button
+                  disabled={selectedSeats.length === 0}
+                  onClick={() => setIsDrawerOpen(true)}
+                  className={`w-full py-4 px-2 tracking-[0.1em] uppercase text-xs hover:scale-105 duration-500 font-bold transition-all
+                    ${selectedSeats.length > 0 
+                      ? "bg-[#1a1a1a] text-[#c4a661] hover:bg-[#c4a661] hover:text-white" 
+                      : "bg-gray-100 text-gray-300 cursor-not-allowed"}`}
+                >
+                  Proceed to Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. THE ROYAL DRAWER (SLIDES FROM RIGHT) */}
+        {isDrawerOpen && <div className={`fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white z-100 shadow-[-25px_0_60px_rgba(0,0,0,0.2)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] p-12 overflow-y-auto translate-x-0`}>
+          
+          <button onClick={() => setIsDrawerOpen(false)} className="text-gray-800 hover:text-black mb-12 flex font-medium items-center gap-2 text-sm tracking-widest">
+            ← BACK TO SELECTION
+          </button>
+
+          <h2 className="text-4xl font-serif font-semibold mb-2 italic">Guest Information</h2>
+          <p className="text-[#ae8b39] text-xs  font-semibold tracking-[0.2em] uppercase mb-12 border-b border-gray-50 pb-4">
+            Securing {selectedSeats.length} seats for your party
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-2">
+              <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Reservation Name</label>
+              <input required type="text" onChange={(e)=>setFormData({...formData, name: e.target.value})} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#c4a661] transition-colors" placeholder="e.g. Lord Byron" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Email Address</label>
+                <input required type="email" onChange={(e)=>setFormData({...formData, email: e.target.value})} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#c4a661]" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Phone</label>
+                <input required type="tel" onChange={(e)=>setFormData({...formData, phone: e.target.value})} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#c4a661]" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Arrival Date</label>
+                <input required type="date" onChange={(e)=>setFormData({...formData, date: e.target.value})} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#c4a661]" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Time of Service</label>
+                <input required type="time" onChange={(e)=>setFormData({...formData, time: e.target.value})} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#c4a661]" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[12px] uppercase tracking-[0.2em] text-gray-800">Special Notes</label>
+              <textarea rows="3" onChange={(e)=>setFormData({...formData, note: e.target.value})} className="w-full bg-[#FAFAFA] border-none p-4 focus:outline-none focus:ring-1 focus:ring-[#c4a661] text-sm" placeholder="Allergies, anniversaries, or special preferences..."></textarea>
+            </div>
+
+            <button type="submit" className="w-full bg-[#1a1a1a] text-[#c4a661] py-5 mt-4 hover:bg-[#c4a661] hover:text-white transition-all duration-500 hover:scale-105 font-bold tracking-[0.3em] uppercase text-xs shadow-xl">
+              Confirm Booking
+            </button>
+          </form>
+        </div>
+        }
+
+        {/* Backdrop */}
+        {isDrawerOpen && <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-40 transition-opacity" onClick={() => setIsDrawerOpen(false)} />}
     </div>
   );
 };
+
 export default BookTable;
