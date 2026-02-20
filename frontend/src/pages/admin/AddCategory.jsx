@@ -4,7 +4,8 @@ import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const AddCategory = () => {
-  const { axios, navigate, loading, setLoading } = useContext(AppContext);
+  const { axios, navigate } = useContext(AppContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: "" });
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -20,7 +21,7 @@ const AddCategory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setIsSubmitting(true);
       const dataToSend = new FormData();
       dataToSend.append("name", formData.name);
       if (file) dataToSend.append("image", file);
@@ -36,7 +37,7 @@ const AddCategory = () => {
     } catch (error) {
       toast.error("Error creating category");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -94,10 +95,10 @@ const AddCategory = () => {
 
           {/* Action Button */}
           <button 
-            disabled={loading}
+            disabled={isSubmitting}
             className="w-full bg-black cursor-pointer text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 disabled:bg-gray-300 transition-all flex items-center justify-center gap-2"
           >
-            {loading ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="animate-spin w-4 h-4" />
                 Processing

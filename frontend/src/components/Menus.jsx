@@ -1,9 +1,11 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import MenuCard from "./MenuCard";
+import { Link } from "react-router-dom";
 
 const Menus = () => {
   const { menus } = useContext(AppContext);
+  const previewMenus = menus.slice(0, 6);
   return (
     <section
       className="relative z-10 min-h-screen py-24 px-6 sm:px-0 md:px-0 lg:px-0 bg-repeat"
@@ -48,7 +50,7 @@ const Menus = () => {
 
         {/* The 12 Categories Grid - Refined to 3 columns for Premium impact */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20">
-          {menus.map((menu, index) => (
+          {previewMenus.map((menu) => (
             <div 
               key={menu._id} 
               className="relative group cursor-pointer"
@@ -66,6 +68,17 @@ const Menus = () => {
             </div>
           ))}
         </div>
+
+        {menus.length > 6 && (
+          <div className="mt-16 flex justify-center">
+            <Link
+              to="/menu"
+              className="px-10 py-4 text-[11px] font-bold uppercase tracking-[0.3em] text-white bg-stone-900 hover:bg-[#B38728] transition-all duration-700 shadow-2xl"
+            >
+              View Full Menu
+            </Link>
+          </div>
+        )}
 
 
       </div>

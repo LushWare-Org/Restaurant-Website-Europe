@@ -4,7 +4,8 @@ import { Upload, X, Loader2, Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const AddMenu = () => {
-  const { axios, navigate, loading, setLoading, categories } = useContext(AppContext);
+  const { axios, navigate, categories } = useContext(AppContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -29,7 +30,7 @@ const AddMenu = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setIsSubmitting(true);
       
       // Professional way to handle multipart
       const dataToSend = new FormData();
@@ -52,7 +53,7 @@ const AddMenu = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -130,7 +131,7 @@ const AddMenu = () => {
 
           {/* Upload Section */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Plating Imagery</label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Showing Imagery</label>
             {!preview ? (
               <label className="flex flex-col items-center justify-center w-full h-44 border-2 border-dashed border-gray-100 hover:border-black bg-gray-50 cursor-pointer transition-all group">
                 <Upload className="w-5 h-5 text-gray-300 group-hover:text-black mb-2" />
@@ -154,10 +155,10 @@ const AddMenu = () => {
           {/* Submit Action */}
           <div className="pt-4">
             <button 
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-black cursor-pointer text-white py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-neutral-800 disabled:bg-gray-300 transition-all flex items-center justify-center gap-3 shadow-lg"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="animate-spin w-4 h-4" />
                   Updating System...
