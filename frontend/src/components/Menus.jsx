@@ -6,7 +6,7 @@ const Menus = () => {
   const { menus } = useContext(AppContext);
   return (
     <section
-      className="relative z-10 min-h-screen py-24 bg-repeat"
+      className="relative z-10 min-h-screen py-24 px-6 sm:px-0 md:px-0 lg:px-0 bg-repeat"
       style={{ 
         backgroundImage: "url('/menubg.jpg')", 
         backgroundSize: "500px", 
@@ -32,7 +32,7 @@ const Menus = () => {
             <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#C5A059]"></div>
           </div>
 
-          <h2 className="text-5xl md:text-7xl font-light tracking-[0.05em] uppercase mb-6">
+          <h2 className="text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-light tracking-[0.05em] uppercase mb-6">
             Food You’ll  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700">Love</span>
           </h2>
           

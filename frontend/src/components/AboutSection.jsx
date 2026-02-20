@@ -16,7 +16,7 @@ export default function AboutSection() {
             <img 
               src={sittingImages[0]} 
               alt="Grand Interior" 
-              className="w-full h-[700px] object-cover rounded-tr-[100px]" 
+              className="w-full h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px]  object-cover rounded-tr-[100px]" 
             />
             <div className="absolute bottom-10 -right-10 w-64 h-80 hidden xl:block shadow-2xl border-8 border-[#FFFDFB]">
               <img src={foodImages[6]} alt="Signature Start" className="w-full h-full object-cover" />
