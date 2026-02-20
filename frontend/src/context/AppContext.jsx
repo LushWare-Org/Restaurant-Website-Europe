@@ -14,10 +14,38 @@ const AppContextProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [menus, setMenus] = useState([]);
 
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({ items: [] });
   const [totalPrice, setTotalPrice] = useState(0);
 
+  // 🔹 Initialize guest cart from localStorage on app load
+  useEffect(() => {
+    if (!user) {
+      const guestCart = localStorage.getItem("guestCart");
+      if (guestCart) {
+        try {
+          setCart(JSON.parse(guestCart));
+        } catch (error) {
+          console.log("Error parsing guest cart:", error);
+          setCart({ items: [] });
+        }
+      }
+    }
+  }, []);
+
+  // 🔹 Save guest cart to localStorage whenever it changes
+  useEffect(() => {
+    if (!user && cart?.items?.length > 0) {
+      localStorage.setItem("guestCart", JSON.stringify(cart));
+    }
+  }, [cart, user]);
+
   const fetchCartData = async () => {
+    // If user is not logged in, cart is already loaded from localStorage
+    if (!user) {
+      return;
+    }
+    
+    // If user is logged in, fetch from API
     try {
       const { data } = await axios.get("/api/cart/get");
       if (data.success) {
@@ -42,6 +70,46 @@ const AppContextProvider = ({ children }) => {
   );
   // 🔹 Add to Cart function
   const addToCart = async (menuId) => {
+    // If user is not logged in, add to cart state (synced to localStorage)
+    if (!user) {
+      try {
+        const menuItem = menus.find(m => m._id === menuId);
+        if (!menuItem) {
+          toast.error("Menu item not found");
+          return;
+        }
+        
+        const existingItem = cart.items?.find(item => item.menuItem._id === menuId);
+        
+        if (existingItem) {
+          setCart({
+            ...cart,
+            items: cart.items.map(item =>
+              item.menuItem._id === menuId 
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+            )
+          });
+        } else {
+          setCart({
+            ...cart,
+            items: [...(cart.items || []), {
+              menuItem,
+              quantity: 1,
+              _id: `${menuId}-${Date.now()}`
+            }]
+          });
+        }
+        toast.success("Item added to cart!");
+        return;
+      } catch (error) {
+        console.error("Add to guest cart error:", error);
+        toast.error("Something went wrong!");
+        return;
+      }
+    }
+    
+    // If user is logged in, use API
     try {
       const { data } = await axios.post("/api/cart/add", {
         menuId,
@@ -56,6 +124,61 @@ const AppContextProvider = ({ children }) => {
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error("Something went wrong!");
+    }
+  };
+
+  // 🔹 Remove from Cart function
+  const removeFromCart = async (menuId) => {
+    // If guest user, update state (synced to localStorage)
+    if (!user) {
+      setCart({
+        ...cart,
+        items: cart.items?.filter(item => item.menuItem._id !== menuId) || []
+      });
+      toast.success("Item removed from cart");
+      return;
+    }
+    
+    // If logged in user, use API
+    try {
+      const { data } = await axios.delete(`/api/cart/remove/${menuId}`);
+      if (data.success) {
+        toast.success(data.message);
+        fetchCartData();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to remove item");
+    }
+  };
+
+  // 🔹 Update Quantity function
+  const updateQuantity = async (menuId, nextQuantity) => {
+    // If guest user, update state (synced to localStorage)
+    if (!user) {
+      setCart({
+        ...cart,
+        items: cart.items?.map(item =>
+          item.menuItem._id === menuId 
+            ? { ...item, quantity: nextQuantity }
+            : item
+        ) || []
+      });
+      return;
+    }
+    
+    // If logged in user, use API
+    try {
+      const { data } = await axios.patch(`/api/cart/update/${menuId}`, {
+        quantity: nextQuantity,
+      });
+      if (data.success) {
+        fetchCartData();
+      } else {
+        toast.error(data.message || "Unable to update cart");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to update cart");
     }
   };
 
@@ -97,6 +220,29 @@ const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/api/auth/is-auth");
       if (data.success) {
         setUser(data.user);
+        
+        // 🔹 Merge guest cart into database cart when user logs in
+        const guestCart = localStorage.getItem("guestCart");
+        if (guestCart) {
+          try {
+            const parsedGuestCart = JSON.parse(guestCart);
+            if (parsedGuestCart.items && parsedGuestCart.items.length > 0) {
+              // Merge guest cart items into server cart
+              for (const item of parsedGuestCart.items) {
+                await axios.post("/api/cart/add", {
+                  menuId: item.menuItem._id,
+                  quantity: item.quantity,
+                });
+              }
+              // Clear guest cart from localStorage
+              localStorage.removeItem("guestCart");
+              // Fetch updated cart from server
+              setTimeout(() => fetchCartData(), 500);
+            }
+          } catch (error) {
+            console.log("Error merging guest cart:", error);
+          }
+        }
       }
     } catch (error) {
       setUser(null);
@@ -122,8 +268,15 @@ const AppContextProvider = ({ children }) => {
     adminIsAuth();
     fetchCategories();
     fetchMenus();
-    fetchCartData();
   }, []);
+
+  // Fetch server cart when user logs in
+  useEffect(() => {
+    if (user) {
+      fetchCartData();
+    }
+  }, [user]);
+
   const value = {
     navigate,
     loading,
@@ -138,6 +291,8 @@ const AppContextProvider = ({ children }) => {
     menus,
     fetchMenus,
     addToCart,
+    removeFromCart,
+    updateQuantity,
     cartCount,
     cart,
     totalPrice,

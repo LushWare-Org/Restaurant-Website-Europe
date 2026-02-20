@@ -120,7 +120,7 @@ const Checkout = () => {
                 </div>
                 <div className="pt-6 border-t border-[#a58d70] flex justify-between items-baseline">
                   <span className="text-sm uppercase tracking-[0.3em] font-bold text-[#1A1A1A]">Total</span>
-                  <span className="text-4xl font-medium font-serif italic text-[#1A1A1A]">
+                  <span className="text-4xl font-semibold font-serif italic text-[#1A1A1A]">
                     £{totalPrice.toLocaleString()}
                   </span>
                 </div>

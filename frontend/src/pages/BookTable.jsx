@@ -18,6 +18,19 @@ const BookTable = () => {
   
   const [selectedDateForBooking, setSelectedDateForBooking] = useState(""); // Date picker for booking view
 
+  // Restore booking details from localStorage on mount
+  useEffect(() => {
+    const savedSeats = localStorage.getItem("selectedSeats");
+    const savedDate = localStorage.getItem("selectedDateForBooking");
+    
+    if (savedSeats) {
+      setSelectedSeats(JSON.parse(savedSeats));
+    }
+    if (savedDate) {
+      setSelectedDateForBooking(savedDate);
+    }
+  }, []);
+
   // Fetch booked seats when date changes
   const fetchBookedSeats = async (date) => {
     try {
@@ -97,6 +110,19 @@ const BookTable = () => {
     setSelectedSeats(selectedSeats.filter(s => s !== id));
   };
 
+  const handleProceedClick = () => {
+    if (!user) {
+      // Save selected seats and date to localStorage before redirecting
+      localStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
+      localStorage.setItem("selectedDateForBooking", selectedDateForBooking);
+      
+      toast.error("Please log in to proceed with your booking.");
+      navigate("/signup");
+      return;
+    }
+    setIsDrawerOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (selectedSeats.length === 0) return toast.error("Please select at least one seat.");
@@ -106,6 +132,9 @@ const BookTable = () => {
       const { data } = await axios.post("/api/booking/create", payload);
       if (data.success) {
         toast.success("Your royal table is ready.");
+        // Clear saved booking details from localStorage
+        localStorage.removeItem("selectedSeats");
+        localStorage.removeItem("selectedDateForBooking");
         navigate("/my-bookings");
       }
     } catch (error) {
@@ -162,7 +191,7 @@ const BookTable = () => {
                     type="date" 
                     value={selectedDateForBooking}
                     onChange={handleBookingDateChange}
-                    className="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#c4a661] transition-colors"
+                    className="w-full cursor-pointer border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#c4a661] transition-colors"
                   />
                 </div>
                 {selectedDateForBooking && bookedSeats.length > 0 && (
@@ -291,7 +320,7 @@ const BookTable = () => {
                 </div>
                 <button
                   disabled={selectedSeats.length === 0 || !selectedDateForBooking}
-                  onClick={() => setIsDrawerOpen(true)}
+                  onClick={handleProceedClick}
                   className={`w-full py-4 px-2 cursor-pointer tracking-[0.1em] uppercase text-xs hover:scale-105 duration-500 font-bold transition-all
                     ${selectedSeats.length > 0 && selectedDateForBooking
                       ? "bg-[#1a1a1a] text-[#c4a661] hover:bg-[#c4a661] hover:text-white" 

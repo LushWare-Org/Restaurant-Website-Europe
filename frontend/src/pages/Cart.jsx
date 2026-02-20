@@ -4,79 +4,59 @@ import { Minus, Plus, UtensilsCrossed, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Cart = () => {
-  const { cart, totalPrice, navigate, axios, fetchCartData } =
+  const { cart, totalPrice, navigate, removeFromCart, updateQuantity, user } =
     useContext(AppContext);
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[500px] bg-[#FFFCF9] border border-[#E5D9C6] mx-auto max-w-4xl my-12 shadow-sm relative overflow-hidden">
-          
-          {/* Corner Accents (Optional for that Royal vibe) */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-[#A68966] opacity-30 m-4"></div>
-          <div className="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-[#A68966] opacity-30 m-4"></div>
+      <div className="flex flex-col items-center justify-center min-h-[500px] bg-[#FFFCF9] border border-[#E5D9C6] mx-auto max-w-4xl my-12 shadow-sm relative overflow-hidden">
+        
+        {/* Corner Accents (Optional for that Royal vibe) */}
+        <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-[#A68966] opacity-30 m-4"></div>
+        <div className="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-[#A68966] opacity-30 m-4"></div>
 
-          {/* Visual Centerpiece */}
-          <div className="mb-8">
-            <div className="relative inline-block">
-              {/* Delicate, thin-stroke icon */}
-              <UtensilsCrossed size={48} strokeWidth={1} className="text-[#A68966] mb-2" />
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-[#A68966]"></div>
-            </div>
+        {/* Visual Centerpiece */}
+        <div className="mb-8">
+          <div className="relative inline-block">
+            {/* Delicate, thin-stroke icon */}
+            <UtensilsCrossed size={48} strokeWidth={1} className="text-[#A68966] mb-2" />
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-[#A68966]"></div>
           </div>
-
-          {/* Typography Suite */}
-          <div className="text-center px-6">
-            <h2 className="text-4xl font-serif font-medium italic text-[#1A1A1A] mb-4 tracking-tight">
-              Your Order Awaits
-            </h2>
-            
-            <p className="text-[#8C7E6A] font-medium text-[11px] uppercase tracking-[0.3em]  leading-loose max-w-sm mx-auto">
-              Your meal is ready <br /> to be customized.
-            </p>
-          </div>
-
-          {/* The "Menu" Button */}
-          <div className="mt-12">
-            <button 
-              onClick={() => navigate("/menu")}
-              className="px-10 py-4 bg-[#1A1A1A] text-white hover:bg-[#A68966] transition-all duration-500 shadow-xl group"
-            >
-              <span className="text-[10px] uppercase tracking-[0.5em] font-bold">
-                View The Full Menu
-              </span>
-            </button>
-          </div>
-
-
         </div>
+
+        {/* Typography Suite */}
+        <div className="text-center px-6">
+          <h2 className="text-4xl font-serif font-medium italic text-[#1A1A1A] mb-4 tracking-tight">
+            Your Order Awaits
+          </h2>
+          
+          <p className="text-[#8C7E6A] font-medium text-[11px] uppercase tracking-[0.3em]  leading-loose max-w-sm mx-auto">
+            Your meal is ready <br /> to be customized.
+          </p>
+        </div>
+
+        {/* The "Menu" Button */}
+        <div className="mt-12">
+          <button 
+            onClick={() => navigate("/menu")}
+            className="px-10 py-4 bg-[#1A1A1A] text-white hover:bg-[#A68966] transition-all duration-500 shadow-xl group"
+          >
+            <span className="text-[10px] uppercase tracking-[0.5em] font-bold">
+              View The Full Menu
+            </span>
+          </button>
+        </div>
+      </div>
     );
   }
 
-  const removeFromCart = async (menuId) => {
-    try {
-      const { data } = await axios.delete(`/api/cart/remove/${menuId}`);
-      if (data.success) {
-        toast.success(data.message);
-        fetchCartData();
-      }
-    } catch (error) {
-      console.log(error);
+  const handleCheckoutClick = () => {
+    if (!user) {
+      toast.error("Please log in to proceed with checkout.");
+      navigate("/signup");
+      return;
     }
-  };
-
-  const updateQuantity = async (menuId, nextQuantity) => {
-    try {
-      const { data } = await axios.patch(`/api/cart/update/${menuId}`, {
-        quantity: nextQuantity,
-      });
-      if (data.success) {
-        fetchCartData();
-      } else {
-        toast.error(data.message || "Unable to update cart");
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Unable to update cart");
-    }
+    navigate("/checkout");
   };
 
   return (
@@ -187,7 +167,7 @@ const Cart = () => {
             </div>
 
             <button
-              onClick={() => navigate("/checkout")}
+              onClick={handleCheckoutClick}
               className="w-full bg-[#1A1A1A] cursor-pointer text-white py-5 group relative overflow-hidden transition-all hover:scale-105 duration-500 hover:bg-[#b77e3a]"
             >
               <span className="relative z-10 text-[11px] uppercase tracking-[0.2em] font-semibold">
