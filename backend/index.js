@@ -19,10 +19,14 @@ connectCloudinary();
 app.use(express.json());
 app.set("trust proxy", 1);
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = [
+  "https://blackpepper-five.vercel.app",
+  "http://localhost:5173",
+  ...(process.env.CLIENT_URL || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+];
 
 app.use(
   cors({
@@ -33,6 +37,8 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(cookieParser());
