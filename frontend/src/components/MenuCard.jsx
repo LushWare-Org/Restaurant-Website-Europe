@@ -47,7 +47,7 @@ const MenuCard = ({ menu }) => {
         <div className="flex items-center gap-6">
           {/* Gold Highlighted Price Section */}
           <div className="flex flex-col bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-500 px-6 py-2.5 ">
-            <p className="text-xl font-light text-stone-900 font-serif">
+            <p className="text-xl font-bold text-stone-900 font-serif">
               <span className="text-xs mr-1 font-sans">£</span>{menu.price}
             </p>
           </div>

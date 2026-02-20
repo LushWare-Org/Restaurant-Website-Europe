@@ -143,7 +143,7 @@ const BookTable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#FFFFFF] border-t-6 border-[#D4AF37] text-[#1a1a1a]">
       {/* --- PREMIUM HERO SECTION --- */}
         <div
           className="relative h-[70vh] bg-cover bg-fixed bg-center flex items-center justify-center overflow-hidden"
