@@ -1,95 +1,115 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
-import { Upload } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+
 const AddCategory = () => {
   const { axios, navigate, loading, setLoading } = useContext(AppContext);
-  const [formData, setFormData] = useState({ name: "", image: null });
+  const [formData, setFormData] = useState({ name: "" });
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-    }
-    setFormData({ ...formData, image: selectedFile });
-    if (selectedFile) {
       setPreview(URL.createObjectURL(selectedFile));
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const { data } = await axios.post("/api/category/add", formData, {
+      const dataToSend = new FormData();
+      dataToSend.append("name", formData.name);
+      if (file) dataToSend.append("image", file);
+
+      const { data } = await axios.post("/api/category/add", dataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       if (data.success) {
-        toast.success(data.message);
+        toast.success("Category Created");
         navigate("/admin/categories");
-      } else {
-        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message || "Something went wrong");
+      toast.error("Error creating category");
     } finally {
       setLoading(false);
     }
   };
-  return (
-    <div className="py-12 flex flex-col items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-md w-full flex flex-col gap-5"
-      >
-        {preview && <img src={preview} alt="preview" className="w-1/2" />}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category Name *
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:border-transparent"
-            placeholder="Enter category name"
-          />
+  return (
+    <div className="min-h-screen bg-white py-16 flex justify-center">
+      <div className="w-full max-w-lg px-6">
+        
+        {/* Simple Professional Header */}
+        <div className="mb-12 border-l-4 border-black pl-6">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 uppercase">Add Category</h1>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category Image
-          </label>
-          <input
-            type="file"
-            id="fileUpload"
-            className="hidden"
-            onChange={handleFileChange}
-            required
-          />
-          {/* Custom upload area */}
-          <label
-            htmlFor="fileUpload"
-            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer  focus:outline-none focus:ring-2 transition"
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          
+          {/* Input Field */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Category Title
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-none focus:outline-none focus:border-black transition-colors text-gray-800"
+              placeholder="e.g. Tasting Menu"
+            />
+          </div>
+
+          {/* Upload Field */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Cover Image
+            </label>
+            
+            {!preview ? (
+              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-100 hover:border-gray-300 bg-gray-50 cursor-pointer transition-all group">
+                <Upload className="w-5 h-5 text-gray-300 group-hover:text-black mb-2" />
+                <span className="text-[11px] text-gray-400 uppercase tracking-tighter">Click to upload photo</span>
+                <input type="file" className="hidden" onChange={handleFileChange} />
+              </label>
+            ) : (
+              <div className="relative group overflow-hidden border border-gray-200">
+                <img src={preview} alt="preview" className="w-full h-48 object-cover" />
+                <button 
+                  type="button"
+                  onClick={() => {setPreview(null); setFile(null);}}
+                  className="absolute top-2 right-2 bg-black text-white p-1 hover:bg-gray-800"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Action Button */}
+          <button 
+            disabled={loading}
+            className="w-full bg-black cursor-pointer text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 disabled:bg-gray-300 transition-all flex items-center justify-center gap-2"
           >
-            <Upload className="w-8 h-8 text-gray-500 mb-2" />
-            <span className="text-gray-600 text-sm">
-              {file ? file.name : "Click to upload an image"}
-            </span>
-          </label>
-        </div>
-        <button className="bg-orange-500 text-white px-8 py-3 cursor-pointer">
-          {loading ? "adding.." : "add category"}
-        </button>
-      </form>
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin w-4 h-4" />
+                Processing
+              </>
+            ) : (
+              "Save Category"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
+
 export default AddCategory;

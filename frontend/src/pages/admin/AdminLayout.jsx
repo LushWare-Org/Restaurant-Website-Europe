@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
+import Loading from "../../components/Loading";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -22,7 +23,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
 const AdminLayout = () => {
-  const { setAdmin, axios } = useContext(AppContext);
+  const { setAdmin, axios, loading } = useContext(AppContext);
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -54,6 +55,7 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen bg-[#FDFCFB]">
+      {loading && <Loading />}
       {/* Mobile Menu Toggle */}
       <div className="lg:hidden fixed top-5 left-5 z-50">
         <button
