@@ -9,6 +9,10 @@ user: {
       type: String,
       required: true,
     },
+     email: {
+      type: String,
+      required: true,
+    },
      phone: {
       type: String,
       required: true,
@@ -17,6 +21,10 @@ user: {
       type: Number,
       required: true,
       min: 1,
+    },
+     reservedSeats: {
+      type: [String],
+      required: true,
     },
       date: {
       type: String,
