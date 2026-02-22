@@ -1,3 +1,6 @@
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "../../context/AppContext";
+import { useNavigate } from "react-router-dom";
 import {
   TrendingUp,
   Users,
@@ -8,64 +11,88 @@ import {
   ChefHat,
 } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total Orders",
-    value: "1,248",
-    trend: "+12%",
-    icon: ShoppingBag,
-  },
-  {
-    title: "Today Bookings",
-    value: "36",
-    trend: "+6%",
-    icon: CalendarDays,
-  },
-  {
-    title: "New Customers",
-    value: "92",
-    trend: "+18%",
-    icon: Users,
-  },
-  {
-    title: "Revenue",
-    value: "$18,420",
-    trend: "+9%",
-    icon: TrendingUp,
-  },
-];
-
-const quickActions = [
-  {
-    title: "Add Menu Item",
-    description: "Create seasonal dishes and promos.",
-    icon: ChefHat,
-  },
-  {
-    title: "Add Category",
-    description: "Organize menu sections in seconds.",
-    icon: PlusCircle,
-  },
-  {
-    title: "Review Orders",
-    description: "Track prep and delivery status.",
-    icon: ClipboardList,
-  },
-];
-
-const recentOrders = [
-  { id: "#ORD-1041", customer: "Evelyn Park", total: "$84.00", status: "Preparing" },
-  { id: "#ORD-1038", customer: "Kiran Patel", total: "$52.50", status: "Completed" },
-  { id: "#ORD-1033", customer: "Mia Stone", total: "$37.20", status: "On the way" },
-];
-
-const upcomingBookings = [
-  { id: "#BK-221", name: "Amir Khan", time: "7:30 PM", party: "4 guests" },
-  { id: "#BK-218", name: "Sofia Rossi", time: "8:00 PM", party: "2 guests" },
-  { id: "#BK-214", name: "Noah Reed", time: "8:45 PM", party: "6 guests" },
-];
-
 const Dashboard = () => {
+  const { axios } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    todayBookings: 0,
+    totalCustomers: 0,
+    totalRevenue: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [recentBookings, setRecentBookings] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await axios.get("/api/dashboard/stats");
+        if (data.success) {
+          setStats({
+            totalOrders: data.stats.totalOrders,
+            todayBookings: data.stats.todayBookings,
+            totalCustomers: data.stats.totalCustomers,
+            totalRevenue: data.stats.totalRevenue,
+          });
+          setRecentOrders(data.recentOrders || []);
+          setRecentBookings(data.recentBookings || []);
+        }
+      } catch (error) {
+        console.log("Error fetching dashboard stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statsData = [
+    {
+      title: "Total Orders",
+      value: stats.totalOrders.toLocaleString(),
+      trend: "+12%",
+      icon: ShoppingBag,
+    },
+    {
+      title: "Today Bookings",
+      value: stats.todayBookings.toString(),
+      trend: "+6%",
+      icon: CalendarDays,
+    },
+    {
+      title: "Total Customers",
+      value: stats.totalCustomers.toLocaleString(),
+      trend: "+18%",
+      icon: Users,
+    },
+    {
+      title: "Total Revenue",
+      value: `£${stats.totalRevenue.toFixed(2)}`,
+      trend: "+9%",
+      icon: TrendingUp,
+    },
+  ];
+
+  const quickActions = [
+    {
+      title: "Add Menu Item",
+      description: "Create seasonal dishes and promos.",
+      icon: ChefHat,
+      onClick: () => navigate("/admin/add-menu"),
+    },
+    {
+      title: "Add Category",
+      description: "Organize menu sections in seconds.",
+      icon: PlusCircle,
+      onClick: () => navigate("/admin/add-category"),
+    },
+    {
+      title: "Review Orders",
+      description: "Track prep and delivery status.",
+      icon: ClipboardList,
+      onClick: () => navigate("/admin/orders"),
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -83,7 +110,7 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((item) => {
+        {statsData.map((item) => {
           const Icon = item.icon;
           return (
             <div
@@ -119,7 +146,8 @@ const Dashboard = () => {
               return (
                 <div
                   key={action.title}
-                  className="rounded-2xl border border-stone-200 bg-stone-50 p-4"
+                  onClick={action.onClick}
+                  className="rounded-2xl border border-stone-200 bg-stone-50 p-4 cursor-pointer hover:bg-stone-100 transition-colors"
                 >
                   <div className="h-9 w-9 rounded-xl bg-stone-900 text-white flex items-center justify-center">
                     <Icon size={18} />
@@ -141,7 +169,7 @@ const Dashboard = () => {
           <div className="mt-4 space-y-4 text-sm">
             <div className="flex items-center justify-between rounded-2xl bg-stone-50 px-4 py-3">
               <span className="text-stone-500">Active tables</span>
-              <span className="font-semibold text-stone-900">12</span>
+              <span className="font-semibold text-stone-900">6</span>
             </div>
             <div className="flex items-center justify-between rounded-2xl bg-stone-50 px-4 py-3">
               <span className="text-stone-500">Kitchen queue</span>
@@ -159,48 +187,56 @@ const Dashboard = () => {
         <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-stone-900">Recent Orders</h2>
           <div className="mt-5 space-y-3">
-            {recentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between rounded-2xl border border-stone-100 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-stone-900">
-                    {order.customer}
-                  </p>
-                  <p className="text-xs text-stone-400">
-                    {order.id} · {order.status}
-                  </p>
+            {recentOrders.length > 0 ? (
+              recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between rounded-2xl border border-stone-100 px-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-stone-900">
+                      {order.customer}
+                    </p>
+                    <p className="text-xs text-stone-400">
+                      #{order.id.slice(-6)} · {order.status}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-stone-900">
+                    £{order.total.toFixed(2)}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-stone-900">
-                  {order.total}
-                </span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-stone-400 text-center py-4">No recent orders</p>
+            )}
           </div>
         </div>
 
         <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-stone-900">Upcoming Bookings</h2>
+          <h2 className="text-lg font-semibold text-stone-900">Recent Bookings</h2>
           <div className="mt-5 space-y-3">
-            {upcomingBookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="flex items-center justify-between rounded-2xl border border-stone-100 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-stone-900">
-                    {booking.name}
-                  </p>
-                  <p className="text-xs text-stone-400">
-                    {booking.id} · {booking.party}
-                  </p>
+            {recentBookings.length > 0 ? (
+              recentBookings.map((booking) => (
+                <div
+                  key={booking.id}
+                  className="flex items-center justify-between rounded-2xl border border-stone-100 px-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-stone-900">
+                      {booking.name}
+                    </p>
+                    <p className="text-xs text-stone-400">
+                      #{booking.id.slice(-6)} · {booking.party}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-stone-900">
+                    {booking.time}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-stone-900">
-                  {booking.time}
-                </span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-stone-400 text-center py-4">No recent bookings</p>
+            )}
           </div>
         </div>
       </div>

@@ -104,3 +104,56 @@ export const updateCartQuantity = async (req, res) => {
     return res.json({ message: "Internal server error", success: false });
   }
 };
+
+// 🔹 Merge guest cart into user cart
+export const mergeGuestCart = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "No items to merge", success: false });
+    }
+
+    let userCart = await Cart.findOne({ user: id });
+    if (!userCart) {
+      userCart = new Cart({ user: id, items: [] });
+    }
+
+    // Merge each guest item into user cart
+    for (const guestItem of items) {
+      const menuId = guestItem.menuItem._id;
+      const quantity = guestItem.quantity;
+
+      // Check if menu item exists
+      const menuItem = await Menu.findById(menuId);
+      if (!menuItem) {
+        console.log(`Menu item ${menuId} not found, skipping`);
+        continue;
+      }
+
+      // Find if item already exists in user cart
+      const existingItem = userCart.items.find(
+        (item) => item.menuItem.toString() === menuId
+      );
+
+      if (existingItem) {
+        // Add to existing quantity
+        existingItem.quantity += quantity;
+      } else {
+        // Add as new item
+        userCart.items.push({ menuItem: menuId, quantity });
+      }
+    }
+
+    await userCart.save();
+    res.status(200).json({ 
+      message: "Guest cart merged successfully", 
+      success: true, 
+      cart: userCart 
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: "Internal server error", success: false });
+  }
+};

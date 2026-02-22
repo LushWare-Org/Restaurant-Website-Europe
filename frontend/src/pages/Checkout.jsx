@@ -63,6 +63,9 @@ const Checkout = () => {
         address,
         phone,
         paymentMethod,
+        totalAmount: grandTotal,
+        subtotal,
+        discount: totalDiscount,
       });
       if (data.success) {
         toast.success(data.message);

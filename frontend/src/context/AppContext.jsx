@@ -17,29 +17,39 @@ const AppContextProvider = ({ children }) => {
   const [cart, setCart] = useState({ items: [] });
   const [totalPrice, setTotalPrice] = useState(0);
   const [activeOffersCount, setActiveOffersCount] = useState(0);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [menusLoaded, setMenusLoaded] = useState(false);
+  const [guestCartMerged, setGuestCartMerged] = useState(false);
+  const [guestCartLoaded, setGuestCartLoaded] = useState(false);
 
-  // 🔹 Initialize guest cart from localStorage on app load
+  // 🔹 Load guest cart ONLY after auth check is complete (ONE TIME on mount)
   useEffect(() => {
-    if (!user) {
+    if (authChecked && !user && !guestCartLoaded) {
       const guestCart = localStorage.getItem("guestCart");
       if (guestCart) {
         try {
           const parsedCart = JSON.parse(guestCart);
-          setCart(parsedCart);
+          if (parsedCart.items && parsedCart.items.length > 0) {
+            setCart(parsedCart);
+          }
         } catch (error) {
           console.log("Error parsing guest cart:", error);
-          setCart({ items: [] });
         }
       }
+      setGuestCartLoaded(true);
     }
-  }, []);
+  }, [authChecked, user, guestCartLoaded]);
 
-  // 🔹 Save guest cart to localStorage whenever it changes
+  // 🔹 Save guest cart to localStorage whenever it changes (ONLY for guest users after loaded)
   useEffect(() => {
-    if (!user && cart?.items?.length > 0) {
-      localStorage.setItem("guestCart", JSON.stringify(cart));
+    if (!user && guestCartLoaded && cart?.items) {
+      if (cart.items.length > 0) {
+        localStorage.setItem("guestCart", JSON.stringify(cart));
+      } else {
+        localStorage.removeItem("guestCart");
+      }
     }
-  }, [cart, user]);
+  }, [cart, user, guestCartLoaded]);
 
   const fetchCartData = async () => {
     try {
@@ -93,9 +103,9 @@ const AppContextProvider = ({ children }) => {
     }
   }, [cart]);
 
-  // 🔹 Enrich cart items with fresh offers whenever menus are updated
+  // 🔹 Enrich cart items with fresh offers whenever menus are updated (preserve guest cart structure)
   useEffect(() => {
-    if (cart?.items && menus.length > 0) {
+    if (cart?.items && cart.items.length > 0 && menus.length > 0) {
       const enrichedItems = cart.items.map((cartItem) => {
         const freshMenuItem = menus.find(
           (m) => m._id === cartItem.menuItem._id
@@ -262,11 +272,14 @@ const AppContextProvider = ({ children }) => {
 
       if (data.success) {
         setMenus(data.menuItems);
+        setMenusLoaded(true);
       } else {
         console.log("Failed to fetch menus");
+        setMenusLoaded(true);
       }
     } catch (error) {
       console.log("Error fetching menus:", error);
+      setMenusLoaded(true);
     } finally {
       setLoading(false);
     }
@@ -289,33 +302,14 @@ const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/api/auth/is-auth");
       if (data.success) {
         setUser(data.user);
-        
-        // 🔹 Merge guest cart into database cart when user logs in
-        const guestCart = localStorage.getItem("guestCart");
-        if (guestCart) {
-          try {
-            const parsedGuestCart = JSON.parse(guestCart);
-            if (parsedGuestCart.items && parsedGuestCart.items.length > 0) {
-              // Merge guest cart items into server cart
-              for (const item of parsedGuestCart.items) {
-                await axios.post("/api/cart/add", {
-                  menuId: item.menuItem._id,
-                  quantity: item.quantity,
-                });
-              }
-              // Clear guest cart from localStorage
-              localStorage.removeItem("guestCart");
-              // Fetch updated cart from server
-              setTimeout(() => fetchCartData(), 500);
-            }
-          } catch (error) {
-            console.log("Error merging guest cart:", error);
-          }
-        }
+      } else {
+        setUser(null);
       }
     } catch (error) {
       setUser(null);
       console.log(error);
+    } finally {
+      setAuthChecked(true);
     }
   };
 
@@ -332,6 +326,41 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
+  // 🔹 Merge guest cart only after auth is known and menus are loaded
+  useEffect(() => {
+    if (authChecked && user && menusLoaded && !guestCartMerged) {
+      const mergeGuestCart = async () => {
+        const guestCart = localStorage.getItem("guestCart");
+        if (guestCart) {
+          try {
+            const parsedGuestCart = JSON.parse(guestCart);
+            if (parsedGuestCart.items && parsedGuestCart.items.length > 0) {
+              // Use new backend merge endpoint
+              const { data } = await axios.post("/api/cart/merge-guest", {
+                items: parsedGuestCart.items,
+              });
+              if (data.success) {
+                localStorage.removeItem("guestCart");
+                fetchCartData();
+              }
+            }
+          } catch (error) {
+            console.log("Error merging guest cart:", error);
+          }
+        }
+        setGuestCartMerged(true);
+      };
+      mergeGuestCart();
+    }
+  }, [authChecked, user, menusLoaded, guestCartMerged]);
+
+  // 🔹 Fetch server cart only after auth is known, user is logged in, and menus are loaded
+  useEffect(() => {
+    if (authChecked && user && menusLoaded) {
+      fetchCartData();
+    }
+  }, [authChecked, user, menusLoaded]);
+
   useEffect(() => {
     isAuth();
     adminIsAuth();
@@ -339,13 +368,6 @@ const AppContextProvider = ({ children }) => {
     fetchMenus();
     fetchActiveOffersCount();
   }, []);
-
-  // Fetch server cart when user logs in
-  useEffect(() => {
-    if (user) {
-      fetchCartData();
-    }
-  }, [user]);
 
   const value = {
     navigate,

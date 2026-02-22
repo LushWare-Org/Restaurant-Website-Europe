@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
 import Loading from "../../components/Loading";
 import {
@@ -27,6 +27,30 @@ const AdminLayout = () => {
   const { setAdmin, axios, loading } = useContext(AppContext);
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
+
+  // Fetch dashboard stats (pending orders and bookings count)
+  const fetchPendingCounts = async () => {
+    try {
+      const { data } = await axios.get("/api/dashboard/stats");
+
+      if (data.success) {
+        setPendingOrdersCount(data.stats.pendingOrders);
+        setPendingBookingsCount(data.stats.pendingBookings);
+      }
+    } catch (error) {
+      console.log("Error fetching dashboard stats:", error);
+    }
+  };
+
+  // Fetch counts on mount and set up auto-refresh
+  useEffect(() => {
+    fetchPendingCounts();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchPendingCounts, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Expanded to 11 Categories for a full, professional feel
   const menuItems = [
@@ -94,6 +118,14 @@ const AdminLayout = () => {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
+              
+              // Determine if we should show a badge
+              let badgeCount = 0;
+              if (item.path === "/admin/orders" && pendingOrdersCount > 0) {
+                badgeCount = pendingOrdersCount;
+              } else if (item.path === "/admin/bookings" && pendingBookingsCount > 0) {
+                badgeCount = pendingBookingsCount;
+              }
 
               return (
                 <Link
@@ -109,7 +141,12 @@ const AdminLayout = () => {
                 >
                   <Icon size={18} className={`mr-4 transition-colors ${active ? "text-amber-400" : "text-stone-500 group-hover:text-amber-400"}`} />
                   <span className={active ? "font-medium" : ""}>{item.name}</span>
-                  {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />}
+                  {badgeCount > 0 && (
+                    <span className="ml-auto flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {badgeCount > 99 ? "99+" : badgeCount}
+                    </span>
+                  )}
+                  {active && !badgeCount && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />}
                 </Link>
               );
             })}

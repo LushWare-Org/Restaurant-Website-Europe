@@ -4,7 +4,7 @@ import Cart from "../models/cartModel.js";
 export const placeOrder = async (req, res) => {
   try {
     const { id } = req.user;
-    const { address, paymentMethod, phone } = req.body;
+    const { address, paymentMethod, phone, totalAmount, subtotal, discount } = req.body;
     if (!address || !phone)
       return res
         .status(400)
@@ -13,9 +13,11 @@ export const placeOrder = async (req, res) => {
     const cart = await Cart.findOne({ user: id }).populate("items.menuItem");
 
     if (!cart || cart.items.length === 0)
-      return res.status(400).json({ message: "Your cart is empty" });
+      return res.status(400).json({ message: "Your cart is empty", success: false });
 
-    const totalAmount = cart.items.reduce(
+    // Use the provided totalAmount from frontend (with discount applied)
+    // Fall back to calculating without discount if not provided
+    const finalTotal = totalAmount || cart.items.reduce(
       (sum, item) => sum + item.menuItem.price * item.quantity,
       0
     );
@@ -26,7 +28,9 @@ export const placeOrder = async (req, res) => {
         menuItem: i.menuItem._id,
         quantity: i.quantity,
       })),
-      totalAmount,
+      subtotal: subtotal || finalTotal,
+      discount: discount || 0,
+      totalAmount: finalTotal,
       address,
       phone,
       paymentMethod,
