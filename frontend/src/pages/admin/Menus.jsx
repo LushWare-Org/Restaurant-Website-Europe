@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
-import { Trash2, UtensilsCrossed } from "lucide-react";
+import { Trash2, UtensilsCrossed, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Menus = () => {
-  const { menus, fetchMenus, axios } = useContext(AppContext);
+  const { menus, fetchMenus, axios, navigate } = useContext(AppContext);
 
   const deleteMenu = async (id) => {
     if (!window.confirm("Remove this item from the culinary menu?")) return;
@@ -70,13 +70,22 @@ const Menus = () => {
                     <p className="text-2xl font-bold font-serif text-stone-900">${Number(item.price).toFixed(2)}</p>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button
-                      onClick={() => deleteMenu(item._id)}
-                      className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
-                      title="Delete Item"
-                    >
-                      <Trash2 size={20} strokeWidth={1.5} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => navigate(`/admin/edit-menu/${item._id}`)}
+                        className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+                        title="Edit Item"
+                      >
+                        <Pencil size={20} strokeWidth={1.5} />
+                      </button>
+                      <button
+                        onClick={() => deleteMenu(item._id)}
+                        className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+                        title="Delete Item"
+                      >
+                        <Trash2 size={20} strokeWidth={1.5} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

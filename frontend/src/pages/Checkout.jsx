@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Pencil } from "lucide-react";
 
 const Checkout = () => {
-  const { totalPrice, axios, navigate, user } = useContext(AppContext);
+  const { totalPrice, axios, navigate, user, fetchCartData } = useContext(AppContext);
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Pay at hotel");
@@ -34,6 +34,7 @@ const Checkout = () => {
       });
       if (data.success) {
         toast.success(data.message);
+        await fetchCartData(); // Refresh cart to reflect the cleared cart
         navigate("/my-orders");
       } else {
         toast.error(data.message);

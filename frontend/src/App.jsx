@@ -68,7 +68,15 @@ const App = () => {
             element={admin ? <AddCategory /> : <AdminLogin />}
           />
           <Route
+            path="edit-category/:id"
+            element={admin ? <AddCategory /> : <AdminLogin />}
+          />
+          <Route
             path="add-menu"
+            element={admin ? <AddMenu /> : <AdminLogin />}
+          />
+          <Route
+            path="edit-menu/:id"
             element={admin ? <AddMenu /> : <AdminLogin />}
           />
           <Route

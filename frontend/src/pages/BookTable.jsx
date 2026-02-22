@@ -169,7 +169,7 @@ const BookTable = () => {
         <div className="relative max-w-6xl mx-auto px-6 -mt-32 z-10">
           <div className="bg-white  rounded-sm ">
               <img 
-                src="/tablesview.png" 
+                src="/tabelview2.png" 
                 alt="System Architecture Layout" 
                 className="w-full h-full object-contain "
               />
@@ -210,70 +210,94 @@ const BookTable = () => {
 
             <h2 className="text-md uppercase font-medium tracking-widest text-gray-800 mb-8 border-b pb-4">02. Select Your Table & Seats</h2>
             
-            {/* Table Selector Tabs */}
-            <div className="flex space-x-4 mb-10 overflow-x-auto pb-2">
+
+            <div className="text-center mb-16">
+              <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#bc9437] mb-2">Step 01</p>
+              <h2 className="text-4xl font-serif font-black text-[#1a1a1a] tracking-tight italic underline decoration-[#bc9437] decoration-4 underline-offset-8">
+                Select Your Table 
+              </h2>
+            </div>
+            {/* Table Navigator - The "Chronograph" Tabs */}
+            <div className="flex justify-center gap-6 mb-24">
               {tableIDs.map((id) => (
                 <button
                   key={id}
                   onClick={() => setActiveTable(id)}
-                  className={`px-8 py-4 rounded-sm transition-all border font-serif text-xl
-                    ${activeTable === id 
-                      ? "bg-[#1a1a1a] text-[#f2d696] border-[#1a1a1a] scale-105 shadow-lg" 
-                      : "bg-white text-gray-600 border-gray-100 hover:border-[#bc9437]"}`}
+                  className={`group cursor-pointer relative w-20 h-20 flex items-center justify-center transition-all duration-500
+                    ${activeTable === id ? "scale-125" : "grayscale opacity-40 hover:opacity-100 hover:grayscale-0"}`}
                 >
-                  Table {id}
+                  {/* Background Ring */}
+                  <div className={`absolute inset-0 rounded-full border-[3px] transition-all duration-500
+                    ${activeTable === id ? "border-[#bc9437] border-[4px] bg-[#1a1a1a] text-[#bc9437] rotate-180" : "border-gray-500"}`} 
+                  />
+                  <span className={`relative z-10 text-2xl font-serif font-black transition-colors duration-500
+                    ${activeTable === id ? "text-[#bc9437]" : "text-[#1a1a1a]"}`}>
+                    {id}
+                  </span>
+                  {activeTable === id && (
+                    <div className="absolute -bottom-4 w-1 h-1 bg-[#bc9437] rounded-full animate-bounce" />
+                  )}
                 </button>
               ))}
             </div>
 
-            {/* Seat Grid for Active Table */}
-            <div className="grid grid-cols-3 md:grid-cols-3 gap-6 max-w-3xl mx-auto p-8 bg-[#FDFDFD] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 rounded-xl">
+            <div className="text-center mb-16">
+              <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#bc9437] mb-2">Step 02</p>
+              <h2 className="text-4xl font-serif font-black text-[#1a1a1a] tracking-tight italic underline decoration-[#bc9437] decoration-4 underline-offset-8">
+                Allocate Seats
+              </h2>
+            </div>
+
+            {/* The Radial Floor Plan - Architectural Polish */}
+            <div className="relative w-[600px] h-[600px] mx-auto flex items-center justify-center">
+              
+              {/* Inner Orbit Ring (Visual Guide) */}
+              <div className="absolute w-[360px] h-[360px] rounded-full border-[1px] border-dashed border-[#bc9437] pointer-events-none" />
+
+              {/* The Central Table (The Heavy Anchor) */}
+              <div className="absolute w-72 h-72 rounded-full bg-[#1a1a1a] border-[4px] border-[#bc9437] shadow-[0_30px_70px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center z-10">
+                    <div className="text-center">
+                        <p className="text-[12px] font-black uppercase tracking-[0.3em] text-[#bc9437] mb-1">Table</p>
+                        <p className="font-serif font-black text-7xl text-[#bc9437]">{activeTable}</p>
+                    </div>
+              </div>
+
+              {/* The 9 Seats arranged in a circle */}
               {[...Array(9)].map((_, i) => {
                 const seatId = `${activeTable}${i}`;
                 const isSelected = selectedSeats.includes(seatId);
                 const isBooked = selectedDateForBooking && bookedSeats.includes(seatId);
                 
+                const angle = (i * 360) / 9;
+                const radius = 240; // Increased radius for more "breathing room"
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
                 return (
                   <button
                     key={seatId}
-                    onClick={() => toggleSeat(activeTable, i)}
                     disabled={isBooked}
-                    className={`relative group cursor-pointer h-28 flex flex-col items-center justify-center transition-all duration-500 rounded-sm border
-                      ${isBooked
-                        ? "bg-red-100 border-red-500 cursor-not-allowed opacity-90"
+                    onClick={() => toggleSeat(activeTable, i)}
+                    style={{ transform: `translate(${x}px, ${y}px)` }}
+                    className={`absolute cursor-pointer w-20 h-20 rounded-none transition-all duration-500 flex flex-col items-center justify-center border-[4px]
+                      ${isBooked 
+                        ? "bg-red-200 border-gray-300 opacity-60 cursor-not-allowed" 
                         : isSelected 
-                        ? "bg-[#121212] border-[#c4a661] shadow-2xl scale-105 z-10" // The Dark Mode Flip
-                        : "bg-white border-gray-300 hover:border-[#c4a661]/40 hover:shadow-md"}`}
+                        ? "bg-[#1a1a1a] border-[#bc9437] shadow-[20px_20px_40px_rgba(0,0,0,0.2)] scale-110 z-20" 
+                        : "bg-white border-[#1a1a1a] hover:border-[#bc9437] hover:-translate-y-2"}`}
                   >
-                    {/* Subtle Tracking label */}
-                    <span className={`text-[12px] uppercase tracking-[0.25em] mb-2 font-medium transition-colors duration-300
-                      ${isBooked ? 'text-red-600' : isSelected ? 'text-[#c4a661]' : 'text-gray-700'}`}>
-                      {isBooked ? 'Booked' : 'Seat'}
-                    </span>
 
-                    {/* The Number */}
-                    <span className={`text-4xl font-serif italic transition-colors duration-300
-                      ${isBooked ? 'text-red-600' : isSelected ? 'text-white' : 'text-[#222]'}`}>
-                      {String(i + 1).padStart(2, '0')}
+                    
+                    <span className={`text-2xl font-serif font-black italic
+                        ${isSelected ? "text-white" : "text-[#1a1a1a]"}`}>
+                        {i + 1}
                     </span>
-
-                    {/* Luxury Selection Indicator for Selected Seats */}
+                    
+                    {/* Selected Accent: Geometric Diamond */}
                     {isSelected && (
-                      <>
-                        {/* Top gold accent line */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[#c4a661]" />
-                        {/* Floating checkmark */}
-                        <div className="absolute -top-2 -right-2 bg-[#c4a661] text-[#121212] rounded-full w-6 h-6 text-[10px] flex items-center justify-center font-bold shadow-lg border border-[#121212]">
-                          ✓
+                        <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#bc9437] rotate-45 flex items-center justify-center shadow-lg border-2 border-[#1a1a1a]">
+                            <span className="text-[10px] text-[#1a1a1a] -rotate-45 font-black">✓</span>
                         </div>
-                      </>
-                    )}
-
-                    {/* Booked Indicator */}
-                    {isBooked && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-red-600 font-bold text-lg">✕</span>
-                      </div>
                     )}
                   </button>
                 );

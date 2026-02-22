@@ -72,7 +72,7 @@ const Orders = () => {
             return (
               <div 
                 key={order._id} 
-                className="bg-white border border-gray-100 shadow-sm rounded-none overflow-hidden"
+                className="bg-white border border-gray-400  rounded-none overflow-hidden"
               >
                 {/* 1. Header Section: Order Identity */}
                 <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-4 gap-6 border-b border-gray-50">

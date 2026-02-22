@@ -35,6 +35,21 @@ export const getAllMenuItems=async(req,res)=>{
    }
 }
 
+export const getMenuItemById=async(req,res)=>{
+   try {
+      const {id}=req.params;
+      const menuItem=await Menu.findById(id).populate("category","name");
+      if (!menuItem)
+      return res
+        .status(404)
+        .json({ message: "Menu item not found", success: false });
+        res.status(200).json({ success: true, menuItem });
+   } catch (error) {
+      console.log(error);
+             return res.json({message:"Internal server error",success:false})
+   }
+}
+
 export const updateMenuItem=async(req,res)=>{
    try {
       const { id } = req.params;

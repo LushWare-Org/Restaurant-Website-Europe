@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
-import { Trash2, FolderTree } from "lucide-react";
+import { Trash2, FolderTree, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Categories = () => {
-  const { categories, fetchCategories, axios } = useContext(AppContext);
+  const { categories, fetchCategories, axios, navigate } = useContext(AppContext);
 
   const deleteCategory = async (id) => {
     if (!window.confirm("Are you sure you want to remove this category?")) return;
@@ -61,13 +61,22 @@ const Categories = () => {
                     <p className="text-xl font-medium text-slate-800 tracking-tight">{item.name}</p>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button
-                      onClick={() => deleteCategory(item._id)}
-                      className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
-                      title="Remove Category"
-                    >
-                      <Trash2 size={20} strokeWidth={1.5} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => navigate(`/admin/edit-category/${item._id}`)}
+                        className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+                        title="Edit Category"
+                      >
+                        <Pencil size={20} strokeWidth={1.5} />
+                      </button>
+                      <button
+                        onClick={() => deleteCategory(item._id)}
+                        className="p-3 cursor-pointer rounded-full text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+                        title="Remove Category"
+                      >
+                        <Trash2 size={20} strokeWidth={1.5} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
