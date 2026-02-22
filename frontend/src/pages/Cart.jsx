@@ -1,11 +1,52 @@
-import { useContext } from "react";
+import { useContext, useState } from "react"; 
 import { AppContext } from "../context/AppContext";
-import { Minus, Plus, UtensilsCrossed, X } from "lucide-react";
+import { Minus, Plus, UtensilsCrossed, X, Tag, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
+import {
+  getOffersWithValues,
+  getBestOffer,
+  calculateCartItemTotal,
+} from "../utils/offerCalculations";
 
 const Cart = () => {
-  const { cart, totalPrice, navigate, removeFromCart, updateQuantity, user } =
+  const { cart, navigate, removeFromCart, updateQuantity, user } =
     useContext(AppContext);
+  
+  const [expandedOffers, setExpandedOffers] = useState({});
+
+  // Toggle offer expansion
+  const toggleOfferExpand = (itemId) => {
+    setExpandedOffers((prev) => ({
+      ...prev,
+      [itemId]: !prev[itemId],
+    }));
+  };
+
+  // Calculate totals
+  const calculateTotals = () => {
+    let subtotal = 0;
+    let totalDiscount = 0;
+
+    cart.items.forEach((item) => {
+      const bestOffer = getBestOffer(item.menuItem.price, item.menuItem.offers);
+      const { totalSavings } = calculateCartItemTotal(
+        item.quantity,
+        item.menuItem.price,
+        bestOffer
+      );
+      
+      subtotal += item.menuItem.price * item.quantity;
+      totalDiscount += totalSavings;
+    });
+
+    return {
+      subtotal,
+      totalDiscount,
+      grandTotal: Math.max(0, subtotal - totalDiscount),
+    };
+  };
+
+  const { subtotal, totalDiscount, grandTotal } = calculateTotals();
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (
@@ -20,7 +61,7 @@ const Cart = () => {
           <div className="relative inline-block">
             {/* Delicate, thin-stroke icon */}
             <UtensilsCrossed size={48} strokeWidth={1} className="text-[#A68966] mb-2" />
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-[#A68966]"></div>
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-px bg-[#A68966]"></div>
           </div>
         </div>
 
@@ -60,7 +101,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-16 px-4 mb-24">
+    <div className="max-w-7xl mx-auto mt-16 px-4 mb-24">
       {/* Royal Header Section */}
       <div className="text-center mb-16">
         <span className="text-[10px] tracking-[0.5em] text-[#A68966] uppercase mb-4 block font-bold">
@@ -69,13 +110,23 @@ const Cart = () => {
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#1A1A1A] italic">
           The Order Hub
         </h1>
-        <div className="w-24 h-[2px] bg-[#A68966] mx-auto mt-6 opacity-90"></div>
+        <div className="w-24 h-0.5 bg-[#A68966] mx-auto mt-6 opacity-90"></div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
         {/* Items Gallery (Left Side) */}
         <div className="lg:col-span-8 space-y-12">
-          {cart.items.map((item) => (
+          {cart.items.map((item) => {
+            const offersWithValues = getOffersWithValues(item.menuItem.price, item.menuItem.offers);
+            const bestOffer = offersWithValues.length > 0 ? offersWithValues[0] : null;
+            const { itemTotal, totalSavings, discountedPrice } = calculateCartItemTotal(
+              item.quantity,
+              item.menuItem.price,
+              bestOffer
+            );
+            const isExpanded = expandedOffers[item._id];
+            
+            return (
             <div 
               key={item._id} 
               className="flex flex-col sm:flex-row gap-8 pb-10 border-b-2 border-[#E8E1D9] items-start group"
@@ -87,6 +138,15 @@ const Cart = () => {
                   alt={item.menuItem.name}
                   className="w-full h-full object-cover transition-transform "
                 />
+                {/* Offer Badge - Shows count if multiple */}
+                {offersWithValues.length > 0 && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded flex items-center gap-1">
+                    <Tag size={12} />
+                    {offersWithValues.length > 1 
+                      ? `${offersWithValues.length} Offers` 
+                      : "1 Offer"}
+                  </div>
+                )}
               </div>
 
               {/* Product Details */}
@@ -97,9 +157,77 @@ const Cart = () => {
                       <h3 className="text-3xl font-serif text-[#1A1A1A] font-bold mb-1 leading-tight tracking-tight">
                         {item.menuItem.name}
                       </h3>
-                      <p className="text-[12px] uppercase tracking-[0.1em] text-[#A68966] font-medium mb-4">
-                        Individual Portion • £{item.menuItem.price.toLocaleString()}
+                      <p className="text-[12px] uppercase tracking-widest text-[#A68966] font-medium mb-4">
+                        Individual Portion
                       </p>
+                      
+                      {/* Price Display with Best Offer */}
+                      <div className="flex items-center gap-3 mb-2">
+                        {bestOffer ? (
+                          <>
+                            <span className="text-[12px] font-bold text-green-600 uppercase tracking-widest">
+                              £{discountedPrice.toFixed(2)}
+                            </span>
+                            <span className="line-through text-[#999] text-[11px]">
+                              £{item.menuItem.price.toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-[12px] font-bold text-[#A68966] uppercase tracking-widest">
+                            £{item.menuItem.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Offers Section */}
+                      {offersWithValues.length > 0 && (
+                        <div className="space-y-2">
+                          {/* Best Offer Highlight */}
+                          <div className="bg-green-50 border border-green-200 p-2 rounded">
+                            <p className="text-[10px] text-green-700 font-bold uppercase">
+                              Best Offer: {bestOffer.title}
+                            </p>
+                            <p className="text-[11px] text-red-600 font-semibold">
+                              Save £{bestOffer.discountAmount.toFixed(2)} ({bestOffer.offerType === "percentage" ? `${bestOffer.discountValue}%` : 'Fixed'})
+                            </p>
+                          </div>
+
+                          {/* Show All Offers Toggle */}
+                          {offersWithValues.length > 1 && (
+                            <button
+                              onClick={() => toggleOfferExpand(item._id)}
+                              className="flex items-center gap-1 text-[11px] font-semibold text-[#A68966] hover:text-[#1A1A1A] transition-colors"
+                            >
+                              <ChevronDown
+                                size={14}
+                                className={`transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                              />
+                              {isExpanded ? "Hide Other Offers" : `See All ${offersWithValues.length - 1} Offers`}
+                            </button>
+                          )}
+
+                          {/* All Offers List */}
+                          {isExpanded && offersWithValues.length > 1 && (
+                            <div className="bg-[#FBF9F6] border border-[#E8E1D9] p-3 rounded space-y-2 mt-2">
+                              {offersWithValues.slice(1).map((offer, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex justify-between items-start text-xs p-2 bg-white rounded border border-[#E8E1D9]"
+                                >
+                                  <div>
+                                    <p className="font-semibold text-[#1A1A1A]">{offer.title}</p>
+                                    <p className="text-[#666]">{offer.offerType === "percentage" ? `${offer.discountValue}%` : `£${offer.discountValue}`}</p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-bold text-green-600">Save £{offer.discountAmount.toFixed(2)}</p>
+                                    <p className="text-[#999]">→ £{offer.discountedPrice.toFixed(2)}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <button 
                       onClick={() => removeFromCart(item.menuItem._id)}
@@ -121,7 +249,7 @@ const Cart = () => {
                     >
                       <Minus size={16} />
                     </button>
-                    <span className="font-serif  font-semibold italic text-xl w-4 text-center text-[#1A1A1A]">
+                    <span className="font-serif font-semibold italic text-xl w-4 text-center text-[#1A1A1A]">
                       {item.quantity}
                     </span>
                     <button
@@ -134,17 +262,25 @@ const Cart = () => {
                   
                   {/* Pricing Logic Fixed */}
                   <div className="text-right">
-                    <span className="block text-[12px] font-bold text-[#A68966] uppercase tracking-[0.1em] mb-1">
+                    <span className="block text-[12px] font-bold text-[#A68966] uppercase tracking-widest mb-1">
                       Total Selection
                     </span>
-                    <span className="text-2xl font-medium text-[#1A1A1A]">
-                      £{(item.menuItem.price * item.quantity).toLocaleString()}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-2xl font-medium text-[#1A1A1A]">
+                        £{itemTotal.toFixed(2)}
+                      </span>
+                      {bestOffer && (
+                        <span className="text-xs text-red-500 font-semibold">
+                          You save £{totalSavings.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Order Summary (Right Side / Sidebar) */}
@@ -157,12 +293,22 @@ const Cart = () => {
             <div className="space-y-4 mb-10">
               <div className="flex justify-between font-semibold text-sm text-[#666]">
                 <span>Subtotal</span>
-                <span>£{totalPrice.toLocaleString()}</span>
+                <span>£{subtotal.toFixed(2)}</span>
               </div>
+
+              {totalDiscount > 0 && (
+                <div className="flex justify-between font-semibold text-sm text-red-600 bg-red-50 px-3 py-2 rounded">
+                  <span className="flex items-center gap-2">
+                    <Tag size={14} />
+                    Total Discount
+                  </span>
+                  <span>-£{totalDiscount.toFixed(2)}</span>
+                </div>
+              )}
 
               <div className="pt-6 mt-6 border-t-2 border-[#E8E1D9] font-semibold flex justify-between items-baseline">
                 <span className="text-lg font-serif italic text-[#1A1A1A]">Grand Total</span>
-                <span className="text-3xl font-light text-[#1A1A1A]">£{totalPrice.toLocaleString()}</span>
+                <span className="text-3xl font-light text-[#1A1A1A]">£{grandTotal.toFixed(2)}</span>
               </div>
             </div>
 

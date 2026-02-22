@@ -53,72 +53,91 @@ const Menus = () => {
 
   return (
     <>
-      {/* Floating Voucher Card */}
-      {showVoucher && allOffers.length > 0 && (
-        <div className={`fixed right-0 bottom-24 z-40 transition-all duration-700 ease-out ${
-          isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-        }`}>
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-[#C5A059] rounded-lg shadow-2xl p-4 w-72 mr-4 relative overflow-hidden group">
-            
-            {/* Decorative Elements */}
-            <div className="absolute top-2 right-2 text-[#C5A059] opacity-20">
-              <Gift size={40} />
-            </div>
+{/* Floating Voucher Card */}
+{showVoucher && allOffers.length > 0 && (
+  <div className={`fixed z-40 transition-all duration-700 ease-out
+    /* Mobile: full-width bottom bar */
+    bottom-0 left-0 right-0
+    /* Desktop: floating card on right */
+    sm:right-0 sm:bottom-24 sm:left-auto
+    ${isVisible ? 'translate-y-0 opacity-100 sm:translate-x-0 sm:translate-y-0' : 'translate-y-full opacity-0 sm:translate-x-full sm:translate-y-0'}
+  `}>
+    <div className="
+      bg-gradient-to-br from-amber-50 to-amber-100 border-t-2 border-[#C5A059] shadow-2xl relative overflow-hidden group
+      /* Mobile: horizontal strip layout */
+      flex items-center gap-3 p-3 rounded-none
+      /* Desktop: card layout */
+      sm:flex-col sm:items-stretch sm:rounded-lg sm:border-2 sm:p-8 sm:w-80 sm:mr-4 sm:mb-0
+    ">
 
-            {/* Close Button */}
-            <button 
-              onClick={() => setShowVoucher(false)}
-              className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={16} />
-            </button>
+      {/* Decorative Gift Icon — hidden on mobile */}
+      <div className="hidden sm:block absolute top-2 right-2 text-[#C5A059] opacity-30">
+        <Gift size={40} />
+      </div>
 
-            {/* Content */}
-            <div className="relative z-10 pt-2">
-              <p className="text-[10px] text-[#C5A059] font-black uppercase tracking-wider mb-1">
-                🎉 Today's Offer
-              </p>
-              
-              <h3 className="text-sm font-bold text-stone-900 mb-2 line-clamp-2">
-                {currentOffer?.title}
-              </h3>
+      {/* Close Button */}
+      <button
+        onClick={() => setShowVoucher(false)}
+        className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 transition-colors"
+      >
+        <X size={16} />
+      </button>
 
-              {/* Offer Details */}
-              <div className="bg-white/60 rounded px-3 py-2 mb-3">
-                {currentOffer?.offerType === "percentage" && (
-                  <p className="text-lg font-black text-amber-700">
-                    {currentOffer.discountValue}% OFF
-                  </p>
-                )}
-                {currentOffer?.offerType === "fixed" && (
-                  <p className="text-lg font-black text-amber-700">
-                    £{currentOffer.discountValue} OFF
-                  </p>
-                )}
-                {!["percentage", "fixed"].includes(currentOffer?.offerType) && (
-                  <p className="text-sm font-bold text-amber-700 capitalize">
-                    {currentOffer?.offerType.replace(/([A-Z])/g, ' $1')}
-                  </p>
-                )}
-                <p className="text-[9px] text-stone-600 mt-1">
-                  {currentOffer?.description}
-                </p>
-              </div>
+      {/* Mobile: small gift icon inline */}
+      <div className="sm:hidden flex-shrink-0 text-[#C5A059] ml-6">
+        <Gift size={24} />
+      </div>
 
-              {/* Claim Button */}
-              <button
-                onClick={() => navigate('/rewards')}
-                className="w-full cursor-pointer bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-800 hover:to-amber-700 text-white text-[10px] font-black uppercase tracking-wider py-2.5 rounded transition-all duration-300 shadow-md"
-              >
-                Claim Now
-              </button>
-            </div>
+      {/* Content */}
+      <div className="relative z-10 flex-1 sm:pt-2">
+        <p className="text-[10px] text-[#C5A059] font-black uppercase tracking-wider mb-0.5 sm:mb-1">
+          🎉 Today's Offer
+        </p>
+        <h3 className="text-xs sm:text-sm font-bold text-stone-900 leading-tight line-clamp-1 sm:line-clamp-2 sm:mb-2">
+          {currentOffer?.title}
+        </h3>
 
-            {/* Pulse Animation */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#C5A059]/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
+        {/* Offer details — condensed on mobile */}
+        <div className="flex items-center gap-2 sm:block sm:bg-white/60 sm:rounded sm:px-3 sm:py-2 sm:mb-3">
+          {currentOffer?.offerType === "percentage" && (
+            <p className="text-sm sm:text-lg font-black text-amber-700">
+              {currentOffer.discountValue}% OFF
+            </p>
+          )}
+          {currentOffer?.offerType === "fixed" && (
+            <p className="text-sm sm:text-lg font-black text-amber-700">
+              £{currentOffer.discountValue} OFF
+            </p>
+          )}
+          {!["percentage", "fixed"].includes(currentOffer?.offerType) && (
+            <p className="text-xs font-bold text-amber-700 capitalize">
+              {currentOffer?.offerType.replace(/([A-Z])/g, ' $1')}
+            </p>
+          )}
+          <p className="hidden sm:block text-[9px] text-stone-600 mt-1">
+            {currentOffer?.description}
+          </p>
         </div>
-      )}
+      </div>
+
+      {/* Claim Button */}
+      <button
+        onClick={() => navigate('/rewards')}
+        className="flex-shrink-0 cursor-pointer bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-800 hover:to-amber-700 text-white text-[10px] font-black uppercase tracking-wider
+          /* Mobile: compact pill */
+          px-4 py-2 rounded-full
+          /* Desktop: full width block */
+          sm:w-full sm:py-2.5 sm:rounded
+          transition-all duration-300 shadow-md"
+      >
+        Claim Now
+      </button>
+    </div>
+
+    {/* Pulse Animation */}
+    <div className="absolute inset-0 bg-gradient-to-r from-[#C5A059]/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+  </div>
+)}
 
       {/* Main Menus Section */}
       <section

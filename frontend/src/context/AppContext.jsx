@@ -24,7 +24,8 @@ const AppContextProvider = ({ children }) => {
       const guestCart = localStorage.getItem("guestCart");
       if (guestCart) {
         try {
-          setCart(JSON.parse(guestCart));
+          const parsedCart = JSON.parse(guestCart);
+          setCart(parsedCart);
         } catch (error) {
           console.log("Error parsing guest cart:", error);
           setCart({ items: [] });
@@ -41,16 +42,42 @@ const AppContextProvider = ({ children }) => {
   }, [cart, user]);
 
   const fetchCartData = async () => {
-    // If user is not logged in, cart is already loaded from localStorage
-    if (!user) {
-      return;
-    }
-    
-    // If user is logged in, fetch from API
     try {
-      const { data } = await axios.get("/api/cart/get");
-      if (data.success) {
-        setCart(data.cart);
+      let cartData = null;
+
+      // If user is not logged in, cart is already loaded from localStorage
+      if (!user) {
+        cartData = cart;
+      } else {
+        // If user is logged in, fetch from API
+        const { data } = await axios.get("/api/cart/get");
+        if (data.success) {
+          cartData = data.cart;
+        }
+      }
+
+      // Enrich cart items with fresh offers
+      if (cartData && cartData.items && menus.length > 0) {
+        const enrichedItems = cartData.items.map((cartItem) => {
+          const freshMenuItem = menus.find((m) => m._id === cartItem.menuItem._id);
+          if (freshMenuItem) {
+            return {
+              ...cartItem,
+              menuItem: {
+                ...cartItem.menuItem,
+                offers: freshMenuItem.offers || [],
+              },
+            };
+          }
+          return cartItem;
+        });
+
+        setCart({
+          ...cartData,
+          items: enrichedItems,
+        });
+      } else if (cartData) {
+        setCart(cartData);
       }
     } catch (error) {
       console.log(error);
@@ -65,6 +92,32 @@ const AppContextProvider = ({ children }) => {
       setTotalPrice(total);
     }
   }, [cart]);
+
+  // 🔹 Enrich cart items with fresh offers whenever menus are updated
+  useEffect(() => {
+    if (cart?.items && menus.length > 0) {
+      const enrichedItems = cart.items.map((cartItem) => {
+        const freshMenuItem = menus.find(
+          (m) => m._id === cartItem.menuItem._id
+        );
+        if (freshMenuItem) {
+          return {
+            ...cartItem,
+            menuItem: {
+              ...cartItem.menuItem,
+              offers: freshMenuItem.offers || [],
+            },
+          };
+        }
+        return cartItem;
+      });
+
+      setCart((prevCart) => ({
+        ...prevCart,
+        items: enrichedItems,
+      }));
+    }
+  }, [menus]);
   const cartCount = cart?.items?.reduce(
     (acc, item) => acc + item.quantity,
     0 || 0
@@ -95,7 +148,10 @@ const AppContextProvider = ({ children }) => {
           setCart({
             ...cart,
             items: [...(cart.items || []), {
-              menuItem,
+              menuItem: {
+                ...menuItem,
+                offers: menuItem.offers || [],
+              },
               quantity: 1,
               _id: `${menuId}-${Date.now()}`
             }]

@@ -1,13 +1,45 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
-import { Pencil } from "lucide-react";
+import { Pencil, Tag } from "lucide-react";
+import {
+  getBestOffer,
+  calculateCartItemTotal,
+} from "../utils/offerCalculations";
 
 const Checkout = () => {
-  const { totalPrice, axios, navigate, user, fetchCartData } = useContext(AppContext);
+  const { cart, axios, navigate, user, fetchCartData } = useContext(AppContext);
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Pay at hotel");
+
+  // Calculate totals with discounts
+  const calculateTotals = () => {
+    let subtotal = 0;
+    let totalDiscount = 0;
+
+    if (cart?.items && cart.items.length > 0) {
+      cart.items.forEach((item) => {
+        const bestOffer = getBestOffer(item.menuItem.price, item.menuItem.offers);
+        const { totalSavings } = calculateCartItemTotal(
+          item.quantity,
+          item.menuItem.price,
+          bestOffer
+        );
+        
+        subtotal += item.menuItem.price * item.quantity;
+        totalDiscount += totalSavings;
+      });
+    }
+
+    return {
+      subtotal,
+      totalDiscount,
+      grandTotal: Math.max(0, subtotal - totalDiscount),
+    };
+  };
+
+  const { subtotal, totalDiscount, grandTotal } = calculateTotals();
 
   useEffect(() => {
     if (user && !address) {
@@ -54,7 +86,7 @@ const Checkout = () => {
               <h2 className="text-3xl font-serif font-semibold italic text-[#1A1A1A] tracking-tight">
                 Guest Information
               </h2>
-              <div className="w-16 h-[2px] bg-[#A68966] mt-4"></div>
+              <div className="w-16 h-0.5 bg-[#A68966] mt-4"></div>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -113,8 +145,19 @@ const Checkout = () => {
               <div className="space-y-6 mb-12">
                 <div className="flex justify-between items-center text-[#8C7E6A]">
                   <span className="text-[13px] font-semibold uppercase tracking-widest">Subtotal</span>
-                  <span className="font-semibold">£{totalPrice.toLocaleString()}</span>
+                  <span className="font-semibold">£{subtotal.toFixed(2)}</span>
                 </div>
+
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between items-center text-red-600 bg-red-50 px-3 py-2 rounded">
+                    <span className="text-[13px] font-semibold uppercase tracking-widest flex items-center gap-2">
+                      <Tag size={14} />
+                      Total Discount
+                    </span>
+                    <span className="font-semibold">-£{totalDiscount.toFixed(2)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center text-[#8C7E6A]">
                   <span className="text-[13px] font-semibold uppercase tracking-widest">Gratuity</span>
                   <span className="italic font-semibold text-xs">Included</span>
@@ -122,7 +165,7 @@ const Checkout = () => {
                 <div className="pt-6 border-t border-[#a58d70] flex justify-between items-baseline">
                   <span className="text-sm uppercase tracking-[0.3em] font-bold text-[#1A1A1A]">Total</span>
                   <span className="text-4xl font-semibold font-serif italic text-[#1A1A1A]">
-                    £{totalPrice.toLocaleString()}
+                    £{grandTotal.toFixed(2)}
                   </span>
                 </div>
               </div>

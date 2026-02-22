@@ -6,7 +6,7 @@ export default function AboutSection() {
   const sittingImages = ['/food/sitting1.jpg', '/food/sitting2.jpg'];
 
   return (
-    <section className="bg-[#FFFDFB] py-24 px-6 md:px-12 lg:px-24">
+    <section className="bg-[#FFFDFB] py-24 z-50 px-6 md:px-12 lg:px-24">
       <div className="max-w-[1400px] mx-auto">
         
         {/* TOP: THE HERO SPLIT */}
