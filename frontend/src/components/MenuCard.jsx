@@ -4,6 +4,49 @@ import { AppContext } from "../context/AppContext";
 const MenuCard = ({ menu }) => {
   const {  addToCart } = useContext(AppContext);
 
+  // Calculate the best discount from available offers
+  const calculateDiscountedPrice = () => {
+    if (!menu.offers || menu.offers.length === 0) {
+      return null;
+    }
+
+    let bestDiscount = 0;
+    let discountReason = "";
+    
+    menu.offers.forEach(offer => {
+      // Only apply direct price discounts for these types
+      if (["percentage", "fixed"].includes(offer.offerType)) {
+        if (offer.offerType === "percentage" && offer.discountValue > 0) {
+          const discount = (menu.price * offer.discountValue) / 100;
+          if (discount > bestDiscount) {
+            bestDiscount = discount;
+            discountReason = offer.title;
+          }
+        } else if (offer.offerType === "fixed" && offer.discountValue > 0) {
+          if (offer.discountValue > bestDiscount) {
+            bestDiscount = offer.discountValue;
+            discountReason = offer.title;
+          }
+        }
+      }
+    });
+
+    // Only return price info if discount is greater than 0
+    if (bestDiscount <= 0) {
+      return null;
+    }
+
+    const newPrice = Math.max(0, menu.price - bestDiscount);
+    return {
+      originalPrice: menu.price,
+      discountedPrice: newPrice.toFixed(2),
+      discount: bestDiscount.toFixed(2),
+      reason: discountReason
+    };
+  };
+
+  const priceInfo = calculateDiscountedPrice();
+
   return (
   <div className="group relative w-full bg-white flex flex-col border border-stone-200 transition-all duration-700 hover:border-stone-900">
     
@@ -23,15 +66,23 @@ const MenuCard = ({ menu }) => {
             <div className="absolute inset-0 bg-red-200/50 blur-md rounded-full scale-110 group-hover:bg-red-300/60 transition-all duration-700"></div>
             
             {/* Main Badge: Deep Wine to Royal Red */}
-            <div className="relative bg-gradient-to-br from-[#921111] via-[#b91c1c] to-[#7f1d1d] px-2 py-1.5 rounded-sm border border-red-400/30 shadow-[0_4px_15px_rgba(153,27,27,0.4)]">
-              <div className="flex flex-col items-center">
+            <div className="relative bg-gradient-to-br from-[#921111] via-[#b91c1c] to-[#7f1d1d] px-2 py-1 rounded-sm border border-red-400/30 shadow-[0_4px_15px_rgba(153,27,27,0.4)] max-w-xs">
+              <div className="flex flex-col items-start gap-1.5">
 
-                
-                <div className="flex items-center gap-2 border-t border-white/20 pt-0.5">
-                  <span className="text-white text-[10px]  font-bold uppercase ">
-                    {menu.offers.length > 1 ? `${menu.offers.length} Bonus Offers` : 'Your Reward Awaits!'}
+                <div>
+                  <span className="text-white text-[10px] font-bold uppercase tracking-wider">
+                    {menu.offers.length > 1 ? `${menu.offers.length} Offers` : "Special Offer"}
                   </span>
                 </div>
+                {menu.offers[0] && (
+                  <div className="border-t border-white/20  w-full">
+                    {!["percentage", "fixed"].includes(menu.offers[0].offerType) && (
+                      <p className="text-yellow-200 text-[9px] font-semibold mt-0.5 capitalize">
+                        {menu.offers[0].offerType.replace(/([A-Z])/g, ' $1')}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -95,12 +146,28 @@ const MenuCard = ({ menu }) => {
           {/* Price Section: Anchored Left */}
           <div className="flex flex-col flex-shrink-0">
             <span className="text-[10px] text-stone-800 uppercase font-black tracking-[0.4em] ">
-              Just
+              {priceInfo ? "Save Now" : "Just"}
             </span>
+            
+            {/* Original Price with Discount */}
+            {priceInfo && (
+              <div className="flex items-center gap-3 ">
+                <span className="text-xl font-serif font-bold text-stone-400 line-through ">
+                  £{priceInfo.originalPrice}
+                </span>
+                <span className="text-xs bg-gradient-to-r from-red-600 to-red-500 text-white px-3 py-1 rounded-md font-black shadow-lg">
+                  Save £{priceInfo.discount}
+                </span>
+              </div>
+            )}
+            
+            {/* Current Price - More Highlighted */}
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-serif font-bold italic text-amber-700">£</span>
-              <span className="text-3xl font-black text-stone-900 font-serif tracking-tighter">
-                {menu.price}
+              <span className={`font-serif font-bold italic ${priceInfo ? 'text-3xl text-red-600' : 'text-2xl text-amber-700'}`}>
+                £
+              </span>
+              <span className={`font-black font-serif tracking-tighter ${priceInfo ? 'text-4xl text-red-600 drop-shadow-lg' : 'text-4xl text-stone-900'}`}>
+                {priceInfo ? priceInfo.discountedPrice : menu.price}
               </span>
             </div>
           </div>

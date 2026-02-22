@@ -111,12 +111,12 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
 
             {/* Center - Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-14">
+            <div className="hidden md:flex font-black items-center space-x-10">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`relative transition-all duration-300 font-serif italic text-md tracking-[0.2em] uppercase font-extrabold ${
+                  className={`relative transition-all duration-300 font-serif italic text-md tracking-[0.2em] uppercase font-black ${
                     isScrolled
                       ? "text-[#1f1e1e] hover:text-[#C5A059]"
                       : "text-[#EDEDED] hover:text-[#C5A059]"
@@ -124,7 +124,7 @@ const Navbar = () => {
                 >
                   {link.name}
                   {link.name === "Rewards" && activeOffersCount > 0 && (
-                    <span className="absolute -top-2 -right-4 bg-[#C5A059] text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">
+                    <span className="absolute -top-2 -right-4 bg-red-600 text-white text-[12px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">
                       {activeOffersCount}
                     </span>
                   )}
