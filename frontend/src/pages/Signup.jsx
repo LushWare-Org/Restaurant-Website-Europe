@@ -70,21 +70,29 @@ const Auth = () => {
           /* Mobile: compact top bar */
           px-6 py-8 sm:px-10 sm:py-10 md:p-20
         ">
-          {/* Texture overlay */}
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.55] pointer-events-none z-10" />
-          {/* Warm gradient bg */}
-          <div className="absolute inset-0 bg-gradient-to-br from-stone-950 via-zinc-950 to-black" />
+          {/* Texture overlay - Increased intensity for a tactile, 'fine paper' feel */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.9] pointer-events-none z-10 mix-blend-overlay" />
           
-          {/* Gold orb */}
-          <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] rounded-full bg-[#da9746]/20 blur-[100px]" />
-          <div className="absolute bottom-[10%] right-0 w-[200px] h-[200px] rounded-full bg-amber-900/30 blur-[80px]" />
+          {/* Darker, richer gradient base */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black via-[#050505] to-[#0a0a0a]" />
+
+          {/* Vignette effect to draw the eye to the center */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
+          
+          {/* Refined Gold/Champagne Orbs - Lower opacity, higher blur for a 'glow' rather than a 'blob' */}
+          <div className="absolute top-[10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-[#da9746]/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-[-10%] right-[5%] w-[400px] h-[400px] rounded-full bg-[#8b5e23]/15 blur-[100px]" />
+
+          {/* Subtle Linear "Gold Thread" - Adds that premium architectural feel */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#da9746]/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#da9746]/10 to-transparent" />
 
           {/* Top row: logo + toggle (mobile shows toggle here) */}
           <div className="relative z-10 flex items-start justify-between gap-4">
             {/* Logo */}
             <Link to="/" className="group flex items-center gap-3">
               <Utensils 
-                className="text-[#da9746] group-hover:rotate-[360deg] transition-all duration-1000 shrink-0" 
+                className="text-[#da9746]  transition-all duration-1000 shrink-0" 
                 size={24} 
                 strokeWidth={2} 
               />
