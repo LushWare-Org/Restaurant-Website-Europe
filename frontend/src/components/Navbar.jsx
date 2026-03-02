@@ -137,7 +137,7 @@ const Navbar = () => {
                     style={{ transformOrigin: "left" }}
                   />
                   {link.name === "Rewards" && activeOffersCount > 0 && (
-                    <span className="absolute -top-2 -right-4 bg-red-600 text-white text-[12px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">
+                    <span className="absolute -top-2 -right-4 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center p-1 justify-center font-bold ">
                       {activeOffersCount}
                     </span>
                   )}
@@ -160,7 +160,7 @@ const Navbar = () => {
               >
                 <ShoppingCart size={20} strokeWidth={1.5} />
                 {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-red-600 text-white text-[12px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm group-hover:scale-110 transition-transform">
+                  <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold p-1 transition-transform">
                     {cartCount}
                   </span>
                 )}

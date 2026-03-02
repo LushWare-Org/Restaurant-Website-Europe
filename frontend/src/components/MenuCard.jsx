@@ -111,23 +111,23 @@ const MenuCard = ({ menu }) => {
       {/* BOTTOM - The Editorial Details */}
       <div className="px-6 py-10 flex flex-col flex-1 bg-white">
         {/* Category & Badge - Using Bold weights for professionalism */}
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-amber-700 text-[11px] tracking-[0.4em] uppercase font-black">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <span className="text-amber-700 text-[9px] sm:text-[11px] tracking-[0.3em] sm:tracking-[0.4em] uppercase font-black">
             {menu.category?.name || "Signature Service"}
           </span>
-          <div className="w-2 h-2 rounded-full bg-stone-900" />
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-stone-900 flex-shrink-0" />
         </div>
 
-        {/* Title - Bold, Serif, High Contrast */}
+        {/* Title */}
         <h3
-          className="text-3xl font-bold font-serif text-stone-900 tracking-tight leading-[1.1] mb-6 cursor-pointer hover:text-amber-700 transition-colors duration-300"
+          className="text-2xl sm:text-3xl font-bold font-serif text-stone-900 tracking-tight leading-[1.1] mb-4 sm:mb-6 cursor-pointer hover:text-amber-700 transition-colors duration-300"
           onClick={handleCardClick}
         >
           {menu.name}
         </h3>
 
-        {/* Description - Medium weight, high-end readability */}
-        <p className="text-[16px] text-stone-700 font-medium leading-relaxed mb-5 border-l-[3px] border-amber-500 pl-3">
+        {/* Description */}
+        <p className="text-[14px] sm:text-[16px] text-stone-700 font-medium leading-relaxed mb-4 sm:mb-5 border-l-[3px] border-amber-500 pl-3">
           {menu.description}
         </p>
 

@@ -132,7 +132,8 @@ const Rewards = () => {
                 maskSize: "cover",
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#F9F7F2]/80 via-transparent to-[#F9F7F2]/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent"></div>
+
           </div>
 
           {/* Main Container: Widened to "Landscape" Rectangular Aspect Ratio */}
@@ -184,7 +185,7 @@ const Rewards = () => {
         )}
 
         {offersLoaded && offers.length > 0 && (
-          <div className="relative max-w-7xl mx-auto pt-8 px-4 lg:px-8">
+          <div className="relative max-w-7xl mx-auto mt-12 px-4 lg:px-8">
             {offers.map((offer, index) => (
               <div
                 key={offer._id}
@@ -453,7 +454,7 @@ const Rewards = () => {
             </div>
 
             {/* Menu Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 px-4 lg:grid-cols-3 gap-8">
               {menuItemsWithOffers.map((menu) => (
                 <div key={menu._id} className="relative">
                   <MenuCard menu={menu} />
